@@ -14,10 +14,12 @@ const plan: { local: C[]; remote: C[]; dir: 0 | 1 | -1; cmd: string; say: string
 const s = computed(() => plan[Math.min(props.step, plan.length - 1)]!)
 const wire = ref<HTMLElement>()
 const typed = ref('')
+let typing: gsap.core.Tween | null = null
 watch(() => [props.active, props.step] as const, ([a]) => {
   if (!a) return
   const full = s.value.cmd; const o = { n: 0 }
-  gsap.to(o, { n: full.length, duration: Math.min(1.2, full.length * 0.03), ease: 'none', onUpdate: () => { typed.value = full.slice(0, Math.round(o.n)) } })
+  typing?.kill()
+  typing = gsap.to(o, { n: full.length, duration: Math.min(1.2, full.length * 0.03), ease: 'none', onUpdate: () => { typed.value = full.slice(0, Math.round(o.n)) } })
   const pk = wire.value!.querySelectorAll('.pk')
   if (s.value.dir) gsap.fromTo(pk, { left: s.value.dir > 0 ? '0%' : '100%', opacity: 1 }, { left: s.value.dir > 0 ? '100%' : '0%', duration: 1.1, stagger: 0.18, ease: 'power2.inOut', delay: 0.3, onComplete() { gsap.to(pk, { opacity: 0, duration: 0.2 }) } })
   else gsap.set(pk, { opacity: 0 })

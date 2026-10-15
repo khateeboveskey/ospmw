@@ -16,6 +16,7 @@ const plan: { wd: F[]; stg: F[]; repo: string[]; cmd: string; say: string }[] = 
 ]
 const s = computed(() => plan[Math.min(props.step, plan.length - 1)]!)
 const typed = ref('')
+let typing: gsap.core.Tween | null = null
 const root = ref<HTMLElement>()
 let state: Flip.FlipState | null = null
 
@@ -32,7 +33,8 @@ watch(() => [props.active, props.step] as const, ([a], [pa]) => {
   state = null
   const full = s.value.cmd
   const o = { n: 0 }
-  gsap.to(o, { n: full.length, duration: Math.min(1.1, full.length * 0.035), ease: 'none', onUpdate: () => { typed.value = full.slice(0, Math.round(o.n)) } })
+  typing?.kill()
+  typing = gsap.to(o, { n: full.length, duration: Math.min(1.1, full.length * 0.035), ease: 'none', onUpdate: () => { typed.value = full.slice(0, Math.round(o.n)) } })
 }, { flush: 'post' })
 </script>
 
