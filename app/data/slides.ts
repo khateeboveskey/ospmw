@@ -77,17 +77,6 @@ const g3way: GraphDef = {
     { refs: { feature: null }, cmd: 'git branch -d feature', say: 'بعد الدمج نحذف الفرع — والتاريخ يبقى محفوظًا.' },
   ],
 }
-const gRebase: GraphDef = {
-  lanes: [{ name: 'main', color: T }, { name: 'feature', color: W }, { name: '', color: 'rgba(255,255,255,.4)' }],
-  nodes: [{ id: 'c1', x: 0, l: 0 }, { id: 'c2', x: 1, l: 0, p: ['c1'] }, { id: 'c3', x: 2, l: 0, p: ['c2'] }, { id: 'f1', x: 2, l: 1, p: ['c2'] }, { id: 'f2', x: 3, l: 1, p: ['f1'] }, { id: "f1'", x: 3, l: 1, p: ['c3'] }, { id: "f2'", x: 4, l: 1, p: ["f1'"] }],
-  dy: 125,
-  steps: [
-    { add: ['c1', 'c2', 'c3', 'f1', 'f2'], refs: { main: 'c3', feature: 'f2' }, head: 'feature', cmd: 'git log --graph --oneline', say: 'main تقدّم بعد أن تفرّعنا منه.' },
-    { add: ["f1'", "f2'"], dim: ['f1', 'f2'], pos: { f1: [2, 2], f2: [3, 2] }, refs: { feature: "f2'" }, cmd: 'git rebase main', say: 'rebase يعيد تطبيق commits الفرع فوق آخر main — بنسخ جديدة وهويات جديدة.' },
-    { head: 'main', refs: { main: "f2'" }, cmd: 'git switch main && git merge feature', say: 'النتيجة: تاريخ خطي نظيف، والدمج أصبح Fast-forward.' },
-    { hide: ['f1', 'f2'], cmd: '# القاعدة الذهبية', say: 'لا تعمل rebase لفرع رفعته وشاركته مع غيرك — لأنه يعيد كتابة التاريخ.' },
-  ],
-}
 const one = [{ name: 'main', color: T }]
 const gReset: GraphDef = {
   title: 'git reset', lanes: one, dx: 170,
@@ -193,7 +182,7 @@ export const slides: Slide[] = [
   ] }, notes: ['بناء Backlog لمشروع حقيقي على GitHub Projects أو Trello', 'تخطيط Sprint أول ونقاش جماعي', 'وزّع الحضور على مجموعات من 3 إلى 4 أشخاص.'] },
 
   /* ---------- Day 2 ---------- */
-  { c: Divider, kind: 'divider', title: 'اليوم الثاني', section: D2, props: { n: '02', label: 'اليوم الثاني', title: '<span class="mono">Git</span><br><em>من الصفر</em>', sessions: [{ t: '4:00', name: 'مفهوم التحكم بالإصدارات' }, { t: '4:30', name: 'الأساسيات' }, { t: '5:45', name: 'الفروع والدمج' }, { t: '7:00', name: 'التراجع والتصحيح + تطبيق' }] }, notes: ['4:00 – 4:30 مفهوم التحكم بالإصدارات', '4:30 – 5:30 الأساسيات', '5:30 – 5:45 استراحة', '5:45 – 7:00 الفروع والدمج', '7:00 – 8:00 التراجع والتصحيح + تطبيق عملي', 'ملاحظة: اليوم الثاني مكتظ؛ إذا كان المشاركون مبتدئين تمامًا، يُفضّل نقل rebase إلى اليوم الثالث أو حذفه، وإعطاء وقت أطول لـ Merge Conflicts لأنها أكثر نقطة يتعثر فيها المبتدئون.'] },
+  { c: Divider, kind: 'divider', title: 'اليوم الثاني', section: D2, props: { n: '02', label: 'اليوم الثاني', title: '<span class="mono">Git</span><br><em>من الصفر</em>', sessions: [{ t: '4:00', name: 'مفهوم التحكم بالإصدارات' }, { t: '4:30', name: 'الأساسيات' }, { t: '5:45', name: 'الفروع والدمج' }, { t: '7:00', name: 'التراجع والتصحيح + تطبيق' }] }, notes: ['4:00 – 4:30 مفهوم التحكم بالإصدارات', '4:30 – 5:30 الأساسيات', '5:30 – 5:45 استراحة', '5:45 – 7:00 الفروع والدمج', '7:00 – 8:00 التراجع والتصحيح + تطبيق عملي', 'أعطِ Merge Conflicts وقتًا كافيًا — أكثر نقطة يتعثر فيها المبتدئون.'] },
   { c: Vcs, steps: 2, time: '4:00 – 4:30', title: 'لماذا Version Control؟', section: D2, props: { time: '4:00 – 4:30' }, notes: ['ما المشكلة التي يحلها Version Control', 'ضغطة 1: الفوضى تتحول إلى تاريخ منظم — من، متى، لماذا.'] },
   { c: GitHub, steps: 3, time: '4:00 – 4:30', title: 'Git مقابل GitHub', section: D2, props: { time: '4:00 – 4:30' }, notes: ['Git مقابل GitHub: الفرق الجوهري', 'Git أداة محلية — GitHub منصة استضافة وتعاون', 'بدائل GitHub: GitLab، Bitbucket — كلها تستخدم Git.'] },
   { c: Terminal, steps: 5, time: '4:30 – 5:30', title: 'git config', section: D2, props: { kicker: 'الأساسيات', time: '4:30 – 5:30', title: 'التثبيت والإعداد', path: '~', items: [
@@ -218,7 +207,6 @@ export const slides: Slide[] = [
   { ...graph([gFF], { kicker: 'الفروع والدمج', time: '5:45 – 7:00', title: 'الدمج: <em class="mono">Fast-forward</em>' }), time: '5:45 – 7:00', title: 'Fast-forward', section: D2, notes: ['الدمج: merge وأنواعه — Fast-forward', 'يحدث عندما لا يتقدم الفرع الهدف بعد التفرع.'] },
   { ...graph([g3way], { kicker: 'الفروع والدمج', time: '5:45 – 7:00', title: 'الدمج الثلاثي: <em class="mono">3-way merge</em>' }), time: '5:45 – 7:00', title: '3-way merge', section: D2, notes: ['الدمج الثلاثي: النسختان + الأصل المشترك', 'ينتج merge commit له أبوان.'] },
   { c: Conflict, steps: 5, time: '5:45 – 7:00', title: 'Merge Conflicts', section: D2, props: { time: '5:45 – 7:00' }, notes: ['حل Merge Conflicts خطوة بخطوة', 'أكثر نقطة يتعثر فيها المبتدئون — أعطها وقتًا كافيًا وجرّبها حيًّا.', 'التعارض يحدث عندما يعدّل فرعان نفس السطر.'] },
-  { ...graph([gRebase], { kicker: 'الفروع والدمج', time: '5:45 – 7:00', title: 'مقدمة في <em class="mono">rebase</em>' }), time: '5:45 – 7:00', title: 'rebase', section: D2, notes: ['مقدمة في rebase ومتى يُستخدم', 'استخدمه لتحديث فرعك المحلي قبل فتح PR.', 'إذا ضاق الوقت: انقل هذه الشريحة لليوم الثالث أو تجاوزها.'] },
   { c: Terminal, steps: 5, time: '7:00 – 8:00', title: 'التراجع والتصحيح', section: D2, props: { kicker: 'التراجع والتصحيح', time: '7:00 – 8:00', title: 'التراجع: <span class="mono">restore</span> و <span class="mono">stash</span>', items: [
     { label: 'git restore app.js', cmd: 'git restore app.js', out: ['<span class="d"># تعديلات app.js غير المحفوظة اختفت</span>'], note: 'يتراجع عن تعديلات ملف في مجلد العمل (قبل add).' },
     { label: 'git restore --staged', cmd: 'git restore --staged app.js', out: ['<span class="d"># app.js خرج من منطقة التجهيز، والتعديلات باقية</span>'], note: 'يُخرج الملف من منطقة التجهيز دون حذف تعديلاتك.' },
