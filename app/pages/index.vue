@@ -157,6 +157,12 @@ function onTouchEnd(e: TouchEvent) {
   else dx < 0 ? next() : prev() // RTL: swipe right reveals the next slide
 }
 
+// #12 or #12.3 → slide 12, build step 3
+function fromHash() {
+  const [hi, hs] = location.hash.slice(1).split('.')
+  go(Math.max(0, Math.min(total - 1, (Number(hi) || 1) - 1 + offset)), Number(hs) || 0)
+}
+
 onMounted(() => {
   fit()
   addEventListener('resize', fit)
@@ -165,15 +171,15 @@ onMounted(() => {
   slots = Array.from(canvas.value!.querySelectorAll<HTMLElement>('.slot'))
   gsap.set(slots, { autoAlpha: 0 })
   gsap.set(bar.value!, { scaleX: 1 / total, transformOrigin: 'right center' })
-  const [hi, hs] = location.hash.slice(1).split('.')
-  const i0 = Math.max(0, Math.min(total - 1, (Number(hi) || 1) - 1 + offset))
-  go(i0, Number(hs) || 0)
+  fromHash()
+  addEventListener('hashchange', fromHash)
   if (mirror) post({ t: 'hello' })
 })
 onBeforeUnmount(() => {
   removeEventListener('resize', fit)
   removeEventListener('keydown', onKey)
   removeEventListener('wheel', onWheel)
+  removeEventListener('hashchange', fromHash)
 })
 
 const pad = (n: number) => String(n).padStart(2, '0')
