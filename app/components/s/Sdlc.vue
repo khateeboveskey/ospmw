@@ -28,7 +28,7 @@ const cur = computed(() => phases[props.step]!)
       <div class="txt">
         <SlideHead kicker="مدخل إلى إدارة المشاريع البرمجية" :time="time" title="دورة حياة<br>تطوير البرمجيات" lead="<span class='mono'>SDLC — Software Development Life Cycle</span>" />
         <Transition name="ph" mode="out-in">
-          <div :key="step" class="card cur">
+          <div :key="step" class="card cur" data-r>
             <div class="row1"><div class="ico"><component :is="cur.i" /></div><span class="mono en">{{ String(step + 1).padStart(2, '0') }} · {{ cur.en }}</span></div>
             <h3>{{ cur.t }}</h3>
             <p>{{ cur.d }}</p>

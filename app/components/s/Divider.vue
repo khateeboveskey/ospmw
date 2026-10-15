@@ -12,7 +12,7 @@ watch(() => props.active, (a) => {
 
 <template>
   <section class="slide div">
-    <div ref="num" class="num" aria-hidden="true">{{ n }}</div>
+    <div ref="num" class="num" aria-hidden="true" data-own>{{ n }}</div>
     <div class="txt">
       <div class="kicker" data-r>{{ label }}</div>
       <h2 class="title xl" data-r v-html="title" />

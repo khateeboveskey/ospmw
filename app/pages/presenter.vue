@@ -53,9 +53,13 @@ onBeforeUnmount(() => { clearInterval(tick); removeEventListener('keydown', onKe
         <div><small>الساعة</small><b class="mono">{{ clock }}</b></div>
       </div>
       <div class="sec">{{ cur.section }} <span v-if="cur.time" class="time">{{ cur.time }}</span></div>
-      <h1>{{ cur.title }}</h1>
-      <div v-if="steps > 1" class="steps">الخطوة <span class="mono">{{ s + 1 }} / {{ steps }}</span></div>
-      <ul class="notes"><li v-for="n in cur.notes" :key="n" v-html="ltr(n)" /></ul>
+      <Transition name="fx" mode="out-in">
+        <div :key="i" class="cur">
+          <h1>{{ cur.title }}</h1>
+          <div v-if="steps > 1" class="steps">الخطوة <span class="mono">{{ s + 1 }} / {{ steps }}</span></div>
+          <ul class="notes"><li v-for="n in cur.notes" :key="n" v-html="ltr(n)" /></ul>
+        </div>
+      </Transition>
       <p v-if="!connected" class="warn">افتح العرض الرئيسي في تبويب آخر من نفس المتصفح (أو اضغط P من العرض).</p>
       <nav class="nav">
         <button aria-label="السابق" @click="post({ t: 'cmd', a: 'prev' })"><ChevronRight /> السابق</button>
@@ -81,6 +85,7 @@ iframe { width: 100%; aspect-ratio: 16 / 9; border: 1px solid var(--line); borde
 .sec { font-size: 15px; color: var(--teal-l); display: flex; gap: 10px; align-items: center; }
 .time { font-size: 13px; padding: 3px 10px; }
 h1 { font-family: var(--serif); font-size: 34px; }
+.cur { display: flex; flex-direction: column; gap: 18px; }
 .steps { font-size: 16px; color: var(--ink-2); }
 .notes { margin: 0; padding-inline-start: 22px; display: flex; flex-direction: column; gap: 12px; font-size: 19px; line-height: 1.6; color: var(--ink-2); }
 .warn { font-size: 15px; color: var(--amber); }

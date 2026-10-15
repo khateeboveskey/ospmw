@@ -39,18 +39,18 @@ const prompt = computed(() => props.path ?? '~/my-app')
       <div class="term" data-r>
         <div class="bar"><i /><i /><i /><span class="mono">bash — {{ prompt }}</span></div>
         <div ref="body" class="body mono">
-          <div v-for="(it, i) in shown" :key="i" class="blk" :class="{ last: i === step }">
+          <TransitionGroup name="fx"><div v-for="(it, i) in shown" :key="i" class="blk" :class="{ last: i === step }">
             <div class="ln"><span class="pp">{{ prompt }}</span> <span class="ps">$</span> {{ i === step ? it.cmd.slice(0, typed) : it.cmd }}<span v-if="i === step" class="caret" /></div>
             <template v-if="i < step || outOn">
               <div v-for="(o, k) in it.out" :key="k" class="o" v-html="o" />
             </template>
-          </div>
+          </div></TransitionGroup>
         </div>
       </div>
       <ol class="side">
         <li v-for="(it, i) in items" :key="i" :class="{ on: i === step, done: i < step }" data-r>
           <code>{{ it.label }}</code>
-          <p v-if="i === step">{{ it.note }}</p>
+          <Transition name="fx"><p v-if="i === step">{{ it.note }}</p></Transition>
         </li>
       </ol>
     </div>
@@ -66,6 +66,7 @@ const prompt = computed(() => props.path ?? '~/my-app')
 .bar span { margin-left: 14px; color: var(--ink-3); font-size: 18px; }
 .body { padding: 26px 30px; font-size: 25px; line-height: 1.6; overflow: hidden; flex: 1; }
 .blk + .blk { margin-top: 14px; }
+.blk { transition: opacity .4s var(--ease); }
 .blk:not(.last) { opacity: 0.45; }
 .pp { color: var(--sky); } .ps { color: var(--teal-l); }
 .o { color: var(--ink-2); white-space: pre; font-size: 22px; }

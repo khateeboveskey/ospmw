@@ -89,9 +89,25 @@ function go(to: number, s = 0, instant = false) {
   tl.fromTo(b,
     { autoAlpha: 1, y: 0, scale: 1, filter: 'blur(0px)', clipPath: dir > 0 ? 'inset(100% 0% 0% 0%)' : 'inset(0% 0% 100% 0%)' },
     { clipPath: 'inset(0% 0% 0% 0%)', duration: divider ? 1.2 : 0.95, ease: 'expo.inOut' }, 0.12)
-  const rev = b.querySelectorAll('[data-r]')
+  if (!a) intro()
+  const rev = revealTargets(b)
   if (rev.length) tl.fromTo(rev, { y: 60, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.9, stagger: 0.07, ease: 'expo.out' }, 0.55)
   tl.call(() => applySteps(b, step.value), [], 0.75)
+}
+
+/* every block animates in: [data-r] elements, plus top-level blocks that have none inside
+   (skipping builds, which applySteps handles, and [data-own] elements a slide animates itself) */
+function revealTargets(b: HTMLElement) {
+  const sec = b.querySelector('section')
+  const top = sec ? [...sec.children].filter((c) => !c.matches('[data-r],[data-own],[data-step]') && !c.querySelector('[data-r]')) : []
+  return [...b.querySelectorAll('[data-r]'), ...top].sort((x, y) => (x.compareDocumentPosition(y) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1))
+}
+
+/* first paint: background, logos and footer ease in instead of popping */
+function intro() {
+  gsap.from('.deck .bg', { autoAlpha: 0, duration: 1.6, ease: 'power2.out' })
+  gsap.from('.chrome-top img', { y: -40, autoAlpha: 0, duration: 1.2, stagger: 0.12, ease: 'expo.out', delay: 0.2 })
+  gsap.from('.chrome-bottom, .progress', { y: 40, autoAlpha: 0, duration: 1.2, ease: 'expo.out', delay: 0.5 })
 }
 
 function next() {
@@ -204,16 +220,20 @@ const pad = (n: number) => String(n).padStart(2, '0')
       </header>
 
       <footer v-if="!mirror" class="chrome-bottom">
-        <div class="where">
-          <span class="sec">{{ cur.section }}</span>
-          <span v-if="cur.time" class="time">{{ cur.time }}</span>
-        </div>
-        <div v-if="stepsOf(idx) > 1" class="dots" aria-hidden="true">
-          <i v-for="n in stepsOf(idx)" :key="n" :class="{ on: n - 1 <= step }" />
-        </div>
+        <Transition name="fx" mode="out-in">
+          <div :key="cur.section + cur.time" class="where">
+            <span class="sec">{{ cur.section }}</span>
+            <span v-if="cur.time" class="time">{{ cur.time }}</span>
+          </div>
+        </Transition>
+        <Transition name="fx" mode="out-in">
+          <div v-if="stepsOf(idx) > 1" :key="idx" class="dots" aria-hidden="true">
+            <i v-for="n in stepsOf(idx)" :key="n" :class="{ on: n - 1 <= step }" />
+          </div>
+        </Transition>
         <nav class="nav" aria-label="التنقل بين الشرائح">
           <button aria-label="الشريحة السابقة" @click="prev"><ChevronRight /></button>
-          <span class="count mono">{{ pad(Math.max(0, idx) + 1) }} <b>/ {{ pad(total) }}</b></span>
+          <span class="count mono"><Transition name="fx" mode="out-in"><span :key="idx" class="cn">{{ pad(Math.max(0, idx) + 1) }}</span></Transition> <b>/ {{ pad(total) }}</b></span>
           <button aria-label="الشريحة التالية" @click="next"><ChevronLeft /></button>
         </nav>
       </footer>
@@ -251,6 +271,7 @@ const pad = (n: number) => String(n).padStart(2, '0')
 .nav button:active { transform: scale(.94); }
 .nav button svg { width: 26px; height: 26px; }
 .count { font-size: 22px; min-width: 110px; text-align: center; direction: ltr; }
+.cn { display: inline-block; }
 .count b { color: var(--ink-3); font-weight: 400; }
 .progress { position: absolute; bottom: 0; inset-inline: 0; height: 5px; background: rgba(255,255,255,.06); }
 .bar { height: 100%; background: linear-gradient(270deg, var(--teal), var(--teal-l)); }

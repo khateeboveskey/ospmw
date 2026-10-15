@@ -18,7 +18,7 @@ watch(() => [props.active, props.step] as const, ([a, s]) => {
     const t = svg.value!.querySelector(`[data-t="${i}"]`)!
     if (i < s) gsap.to([p, t], { opacity: 0.35, strokeDashoffset: 0, duration: 0.4 })
     else if (i === s) { gsap.fromTo(p, { strokeDashoffset: 1, opacity: 1 }, { strokeDashoffset: 0, duration: 1, ease: 'power2.inOut', delay: 0.3 }); gsap.fromTo(t, { opacity: 0 }, { opacity: 1, duration: 0.5, delay: 0.8 }) }
-    else gsap.set([p, t], { opacity: 0 })
+    else gsap.to([p, t], { opacity: 0, duration: 0.3 })
   })
 })
 </script>

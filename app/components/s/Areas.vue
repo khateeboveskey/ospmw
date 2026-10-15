@@ -25,6 +25,7 @@ watch(() => [props.active, props.step] as const, ([a], [pa]) => {
   if (!a) return
   if (state && pa) {
     Flip.from(state, {
+      targets: root.value!.querySelectorAll('[data-flip-id]:not([data-leaving])'),
       duration: 0.9, ease: 'expo.inOut', absolute: true, scale: true,
       onEnter: (els) => gsap.fromTo(els, { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.7, delay: 0.5, ease: 'back.out(2)' }),
       onLeave: (els) => gsap.to(els, { opacity: 0, scale: 0.3, x: 200, duration: 0.6, ease: 'power3.in' }),
@@ -36,6 +37,17 @@ watch(() => [props.active, props.step] as const, ([a], [pa]) => {
   typing?.kill()
   typing = gsap.to(o, { n: full.length, duration: Math.min(1.1, full.length * 0.035), ease: 'none', onUpdate: () => { typed.value = full.slice(0, Math.round(o.n)) } })
 }, { flush: 'post' })
+
+/* items removed from a zone: if they reappear elsewhere Flip moves the new copy, otherwise they fly out */
+function onLeave(el: Element, done: () => void) {
+  const h = el as HTMLElement
+  h.dataset.leaving = ''
+  const id = h.dataset.flipId
+  const moved = root.value?.querySelector(`[data-flip-id="${id}"]:not([data-leaving])`)
+  gsap.set(h, { position: 'absolute', top: h.offsetTop, left: h.offsetLeft, width: h.offsetWidth, margin: 0 })
+  if (moved) return gsap.to(h, { opacity: 0, duration: 0.15, onComplete: done })
+  gsap.to(h, { opacity: 0, x: 220, scale: 0.4, duration: 0.7, ease: 'power3.in', onComplete: done })
+}
 </script>
 
 <template>
@@ -44,23 +56,23 @@ watch(() => [props.active, props.step] as const, ([a], [pa]) => {
     <div class="zones" dir="ltr" data-r>
       <div class="z">
         <div class="zh"><FolderOpen /><div><b>Working Directory</b><span>مجلد العمل</span></div></div>
-        <div class="files">
+        <TransitionGroup tag="div" class="files" :css="false" @leave="onLeave">
           <div v-for="f in s.wd" :key="'wd' + f.id" :data-flip-id="f.id" class="file"><i :class="f.st">{{ f.st }}</i>{{ f.id }}</div>
-        </div>
+        </TransitionGroup>
       </div>
       <div class="arr"><span class="mono">git add</span><svg viewBox="0 0 120 24"><path d="M0 12 H110 M100 2 L112 12 L100 22" /></svg></div>
       <div class="z">
         <div class="zh"><PackageCheck /><div><b>Staging Area</b><span>منطقة التجهيز</span></div></div>
-        <div class="files">
+        <TransitionGroup tag="div" class="files" :css="false" @leave="onLeave">
           <div v-for="f in s.stg" :key="'st' + f.id" :data-flip-id="f.id" class="file"><i :class="f.st">{{ f.st }}</i>{{ f.id }}</div>
-        </div>
+        </TransitionGroup>
       </div>
       <div class="arr"><span class="mono">git commit</span><svg viewBox="0 0 120 24"><path d="M0 12 H110 M100 2 L112 12 L100 22" /></svg></div>
       <div class="z repo">
         <div class="zh"><Database /><div><b>Repository (.git)</b><span>المستودع</span></div></div>
-        <div class="commits">
+        <TransitionGroup tag="div" class="commits" :css="false" @leave="onLeave">
           <div v-for="(c, i) in s.repo" :key="c" :data-flip-id="'c' + c" class="cm"><span class="dot" /><b class="mono">{{ c }}</b><span>{{ i ? 'feat: add homepage' : 'initial commit' }}</span></div>
-        </div>
+        </TransitionGroup>
       </div>
     </div>
     <div class="foot">
@@ -78,7 +90,7 @@ watch(() => [props.active, props.step] as const, ([a], [pa]) => {
 .zh svg { width: 44px; height: 44px; color: var(--teal-l); stroke-width: 1.5; }
 .zh b { display: block; font-family: var(--mono); font-size: 25px; }
 .zh span { font-size: 22px; color: var(--ink-3); }
-.files, .commits { display: flex; flex-direction: column; gap: 14px; }
+.files, .commits { position: relative; display: flex; flex-direction: column; gap: 14px; }
 .file { display: flex; align-items: center; gap: 14px; font-family: var(--mono); font-size: 24px; padding: 14px 18px; border-radius: 14px; background: var(--navy); border: 1px solid rgba(255,255,255,.18); }
 .file i { font-style: normal; width: 34px; height: 34px; border-radius: 8px; display: grid; place-items: center; font-size: 18px; font-weight: 700; }
 .file i.M { background: rgba(244,194,107,.2); color: var(--amber); }

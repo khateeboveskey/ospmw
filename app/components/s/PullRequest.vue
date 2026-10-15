@@ -22,14 +22,14 @@ const stages = [
     </div>
     <div class="pr card" data-step="2">
       <div class="top" dir="ltr">
-        <span class="state mono" :class="{ merged: step >= 5 }"><component :is="step >= 5 ? GitMerge : GitPullRequest" /> {{ step >= 5 ? 'Merged' : 'Open' }}</span>
+        <Transition name="fx" mode="out-in"><span :key="String(step >= 5)" class="state mono" :class="{ merged: step >= 5 }"><component :is="step >= 5 ? GitMerge : GitPullRequest" /> {{ step >= 5 ? 'Merged' : 'Open' }}</span></Transition>
         <b class="mono">feat: add login page</b><span class="num mono">#42</span>
       </div>
       <p class="desc"><span class="mono">feature/login → main</span> · يضيف صفحة تسجيل الدخول مع التحقق من المدخلات. <span class="mono link">Closes #17</span></p>
       <div class="rows">
-        <div class="r" :class="{ ok: step >= 3 }"><MessageSquare /> <span>Code Review</span><b>{{ step >= 3 ? 'تمت الموافقة (Approved) من مراجعَين' : 'بانتظار المراجعة' }}</b></div>
-        <div class="r" :class="{ ok: step >= 4 }"><CircleCheck /> <span>Checks</span><b>{{ step >= 4 ? 'build ✓ · test ✓ · lint ✓' : '…' }}</b></div>
-        <div class="r" :class="{ ok: step >= 5 }"><Check /> <span>Merge</span><b>{{ step >= 5 ? 'دُمج في main وحُذف الفرع' : 'غير جاهز' }}</b></div>
+        <div class="r" :class="{ ok: step >= 3 }"><MessageSquare /> <span>Code Review</span><Transition name="fx" mode="out-in"><b :key="String(step >= 3)">{{ step >= 3 ? 'تمت الموافقة (Approved) من مراجعَين' : 'بانتظار المراجعة' }}</b></Transition></div>
+        <div class="r" :class="{ ok: step >= 4 }"><CircleCheck /> <span>Checks</span><Transition name="fx" mode="out-in"><b :key="String(step >= 4)">{{ step >= 4 ? 'build ✓ · test ✓ · lint ✓' : '…' }}</b></Transition></div>
+        <div class="r" :class="{ ok: step >= 5 }"><Check /> <span>Merge</span><Transition name="fx" mode="out-in"><b :key="String(step >= 5)">{{ step >= 5 ? 'دُمج في main وحُذف الفرع' : 'غير جاهز' }}</b></Transition></div>
       </div>
     </div>
   </section>
@@ -54,7 +54,7 @@ const stages = [
 .link { color: var(--sky); }
 .rows { display: flex; flex-direction: column; gap: 12px; }
 .r { display: flex; align-items: center; gap: 16px; padding: 14px 20px; border-radius: 14px; background: rgba(255,255,255,.04); font-size: 22px; color: var(--ink-3); transition: all .5s; }
-.r svg { width: 28px; height: 28px; }
+.r svg { width: 28px; height: 28px; transition: color .5s; }
 .r span { font-family: var(--mono); width: 170px; direction: ltr; text-align: right; }
 .r.ok { color: #fff; background: rgba(28,157,142,.16); } .r.ok svg { color: var(--teal-l); }
 </style>

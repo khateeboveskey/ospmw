@@ -9,7 +9,7 @@ watch(() => [props.active, props.step] as const, ([a, s], [pa]) => {
   // cards travel from the product backlog into the sprint and out as an increment
   const cards = stage.value!.querySelectorAll('.fly')
   if (s >= 1) gsap.fromTo(cards, { x: 0, opacity: 1 }, { x: 450, duration: 1.2, stagger: 0.15, ease: 'expo.inOut' })
-  else gsap.set(cards, { x: 0 })
+  else gsap.to(cards, { x: 0, duration: 0.8, ease: 'expo.inOut' })
 })
 </script>
 

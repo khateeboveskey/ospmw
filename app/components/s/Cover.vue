@@ -13,7 +13,7 @@ watch(() => props.active, (a) => {
   const dots = art.value.querySelectorAll('circle')
   tl = gsap.timeline({ delay: 0.5 })
     .fromTo(paths, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.6, stagger: 0.25, ease: 'power2.inOut' })
-    .fromTo(dots, { attr: { r: 0 } }, { attr: { r: (i: number, el: SVGCircleElement) => Number(el.dataset.r) }, duration: 0.6, stagger: 0.07, ease: 'back.out(2.5)' }, 0.4)
+    .fromTo(dots, { attr: { r: 0 } }, { attr: { r: (i: number, el: SVGCircleElement) => Number(el.dataset.rad) }, duration: 0.6, stagger: 0.07, ease: 'back.out(2.5)' }, 0.4)
     .to(art.value, { y: -14, duration: 3, ease: 'sine.inOut', yoyo: true, repeat: -1 })
 })
 </script>
@@ -32,23 +32,23 @@ watch(() => props.active, (a) => {
       </div>
       <p class="hint" data-r>المسافة · الأسهم · التمرير للتنقل &nbsp;—&nbsp; <kbd>F</kbd> ملء الشاشة · <kbd>P</kbd> عرض المقدّم</p>
     </div>
-    <svg ref="art" class="art" viewBox="0 0 560 860" aria-hidden="true">
+    <svg ref="art" class="art" data-own viewBox="0 0 560 860" aria-hidden="true">
       <path d="M280 840 V20" stroke="#1c9d8e" pathLength="1" />
       <path d="M280 700 C280 620 440 640 440 560 V380 C440 300 280 320 280 240" stroke="#ffffff" pathLength="1" />
       <path d="M280 520 C280 460 120 470 120 400 V300" stroke="#6fd6c8" pathLength="1" />
       <path d="M440 470 C440 420 520 420 520 360" stroke="#8fc3dd" pathLength="1" />
-      <circle cx="280" cy="840" data-r="16" fill="#1c9d8e" />
-      <circle cx="280" cy="700" data-r="16" fill="#1c9d8e" />
-      <circle cx="280" cy="520" data-r="16" fill="#1c9d8e" />
-      <circle cx="440" cy="560" data-r="14" fill="#fff" />
-      <circle cx="440" cy="470" data-r="14" fill="#fff" />
-      <circle cx="120" cy="400" data-r="14" fill="#6fd6c8" />
-      <circle cx="120" cy="300" data-r="14" fill="#6fd6c8" />
-      <circle cx="440" cy="380" data-r="14" fill="#fff" />
-      <circle cx="520" cy="360" data-r="12" fill="#8fc3dd" />
-      <circle cx="280" cy="400" data-r="16" fill="#1c9d8e" />
-      <circle cx="280" cy="240" data-r="22" fill="#1c9d8e" stroke="#fff" stroke-width="5" />
-      <circle cx="280" cy="20" data-r="10" fill="#1c9d8e" />
+      <circle cx="280" cy="840" data-rad="16" fill="#1c9d8e" />
+      <circle cx="280" cy="700" data-rad="16" fill="#1c9d8e" />
+      <circle cx="280" cy="520" data-rad="16" fill="#1c9d8e" />
+      <circle cx="440" cy="560" data-rad="14" fill="#fff" />
+      <circle cx="440" cy="470" data-rad="14" fill="#fff" />
+      <circle cx="120" cy="400" data-rad="14" fill="#6fd6c8" />
+      <circle cx="120" cy="300" data-rad="14" fill="#6fd6c8" />
+      <circle cx="440" cy="380" data-rad="14" fill="#fff" />
+      <circle cx="520" cy="360" data-rad="12" fill="#8fc3dd" />
+      <circle cx="280" cy="400" data-rad="16" fill="#1c9d8e" />
+      <circle cx="280" cy="240" data-rad="22" fill="#1c9d8e" stroke="#fff" stroke-width="5" />
+      <circle cx="280" cy="20" data-rad="10" fill="#1c9d8e" />
     </svg>
   </section>
 </template>

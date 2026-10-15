@@ -15,7 +15,7 @@ watch(() => [props.active, props.step] as const, ([a, s]) => {
   js.forEach((j) => {
     tl!.to(j, { '--p': 1, duration: 0.6, ease: 'power1.inOut' }).call(() => j.classList.add('ok'))
   })
-  tl.call(() => {}, [], '+=1.5').call(() => js.forEach((j) => j.classList.remove('ok'))).set(js, { '--p': 0 })
+  tl.call(() => {}, [], '+=1.5').call(() => js.forEach((j) => j.classList.remove('ok'))).to(js, { '--p': 0, duration: 0.5, ease: 'power2.inOut' })
 })
 </script>
 
@@ -62,7 +62,7 @@ li svg { width: 28px; height: 28px; color: var(--teal-l); flex: none; }
 .pipe::before { content: ''; position: absolute; top: 40px; left: 30px; right: 30px; height: 3px; background: rgba(255,255,255,.12); }
 .job { --p: 0; position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 18px; color: var(--ink-2); }
 .ring { width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(var(--teal-l) calc(var(--p) * 360deg), rgba(255,255,255,.1) 0); position: relative; }
-.ring::before { content: ''; position: absolute; inset: 5px; border-radius: 50%; background: var(--navy-d); }
+.ring::before { content: ''; position: absolute; inset: 5px; border-radius: 50%; background: var(--navy-d); transition: background .4s var(--ease); }
 .ring svg { position: relative; width: 28px; height: 28px; stroke-width: 3; color: var(--teal-l); opacity: 0; transform: scale(.4); transition: all .3s var(--ease); }
 .job.ok .ring::before { background: var(--teal); } .job.ok .ring svg { opacity: 1; transform: none; color: #fff; }
 .yml { margin: 0; font-size: 21px; line-height: 1.6; padding: 22px 26px; border-radius: 16px; background: rgba(2,20,29,.75); border: 1px solid var(--line); color: var(--ink-2); }

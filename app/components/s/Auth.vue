@@ -8,7 +8,10 @@ watch(() => [props.active, props.step] as const, ([a, s]) => {
   if (!a) return
   if (s === 0) {
     open.value = false
-    gsap.fromTo(key.value!, { x: 0, rotate: 0 }, { x: -230, duration: 1.2, ease: 'expo.inOut', delay: 0.9, onComplete: () => { gsap.to(key.value!, { rotate: 90, duration: 0.4, onComplete: () => { open.value = true } }) } })
+    gsap.timeline()
+      .to(key.value!, { x: 0, rotate: 0, duration: 0.4, ease: 'power2.out' })
+      .to(key.value!, { x: -230, duration: 1.2, ease: 'expo.inOut' }, 0.9)
+      .to(key.value!, { rotate: 90, duration: 0.4, onComplete: () => { open.value = true } })
   }
 })
 </script>
@@ -22,7 +25,7 @@ watch(() => [props.active, props.step] as const, ([a, s]) => {
         <p>زوج مفاتيح: <b>المفتاح العام</b> يُرفع إلى GitHub كقفل، و<b>المفتاح الخاص</b> يبقى على جهازك فقط.</p>
         <div class="anim" dir="ltr">
           <div class="dev"><span ref="key" class="key"><KeyRound /></span><small>private key · جهازك</small></div>
-          <div class="lk" :class="{ open }"><component :is="open ? LockOpen : Lock" /><small>public key · GitHub</small></div>
+          <div class="lk" :class="{ open }"><Transition name="fx" mode="out-in"><component :is="open ? LockOpen : Lock" :key="String(open)" /></Transition><small>public key · GitHub</small></div>
         </div>
         <code>ssh-keygen -t ed25519 -C "you@example.com"</code>
       </div>

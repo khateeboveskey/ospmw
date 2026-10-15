@@ -16,7 +16,7 @@ watch(() => [props.active, props.step] as const, ([a, s], [pa]) => {
   if (!a) return
   const f = mess.value!.querySelectorAll('.f')
   if (s === 0) {
-    gsap.set(tl.value!, { autoAlpha: 0 })
+    gsap.to(tl.value!, { autoAlpha: 0, duration: 0.4 })
     gsap.fromTo(f, { y: -300, opacity: 0, rotate: 0 }, { y: 0, opacity: 1, rotate: (i: number) => rot[i]!, duration: 0.9, stagger: 0.12, ease: 'bounce.out', delay: pa ? 0 : 0.6 })
   } else {
     gsap.to(f, { x: 0, y: 0, scale: 0.2, opacity: 0, rotate: 0, duration: 0.7, stagger: 0.05, ease: 'power3.in' })

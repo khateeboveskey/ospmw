@@ -22,7 +22,7 @@ watch(() => [props.active, props.step] as const, ([a]) => {
   typing = gsap.to(o, { n: full.length, duration: Math.min(1.2, full.length * 0.03), ease: 'none', onUpdate: () => { typed.value = full.slice(0, Math.round(o.n)) } })
   const pk = wire.value!.querySelectorAll('.pk')
   if (s.value.dir) gsap.fromTo(pk, { left: s.value.dir > 0 ? '0%' : '100%', opacity: 1 }, { left: s.value.dir > 0 ? '100%' : '0%', duration: 1.1, stagger: 0.18, ease: 'power2.inOut', delay: 0.3, onComplete() { gsap.to(pk, { opacity: 0, duration: 0.2 }) } })
-  else gsap.set(pk, { opacity: 0 })
+  else gsap.to(pk, { opacity: 0, duration: 0.3 })
 })
 </script>
 
@@ -33,7 +33,7 @@ watch(() => [props.active, props.step] as const, ([a]) => {
       <div class="box">
         <div class="bh"><Laptop /><b>جهازك (local)</b></div>
         <div class="row"><TransitionGroup name="c"><span v-for="c in s.local" :key="c.h" class="c mono" :class="{ ghost: c.ghost }">{{ c.h }}</span></TransitionGroup></div>
-        <span class="br mono">main{{ s.local.some(c => c.ghost) ? '   origin/main → c3' : '' }}</span>
+        <Transition name="fx" mode="out-in"><span :key="String(s.local.some(c => c.ghost))" class="br mono">main{{ s.local.some(c => c.ghost) ? '   origin/main → c3' : '' }}</span></Transition>
         <Transition name="c"><div v-if="s.mate" class="mate"><UserPlus /><span>جهاز زميل جديد</span><span class="row"><span v-for="c in s.local" :key="c.h" class="c mono sm">{{ c.h }}</span></span></div></Transition>
       </div>
       <div ref="wire" class="wire">
@@ -62,6 +62,7 @@ watch(() => [props.active, props.step] as const, ([a]) => {
 .row { display: flex; gap: 14px; align-items: center; min-height: 80px; }
 .c { width: 76px; height: 76px; border-radius: 50%; display: grid; place-items: center; background: var(--teal); font-size: 22px; font-weight: 700; color: var(--navy-dd); position: relative; }
 .c + .c::before { content: ''; position: absolute; right: 100%; width: 14px; height: 4px; background: var(--teal); }
+.c { transition: background .5s var(--ease), border-color .5s, color .5s; }
 .c.ghost { background: transparent; border: 3px dashed var(--teal-l); color: var(--teal-l); }
 .c.sm { width: 50px; height: 50px; font-size: 16px; }
 .br { font-size: 20px; color: var(--ink-3); white-space: pre; }

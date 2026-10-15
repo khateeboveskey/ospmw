@@ -136,7 +136,7 @@ onMounted(reset)
   <div class="gg">
     <div v-if="title" class="gt">{{ title }}</div>
     <svg ref="root" :viewBox="`0 0 ${W} ${H}`" class="svg" dir="ltr" role="img" :aria-label="st.say || title">
-      <g v-for="(l, i) in lanes" :key="l.name" class="lane" :opacity="[...st.on].some(id => Math.round((st.pos[id]?.[1] ?? byId[id]!.l)) === i) ? 1 : 0.15">
+      <g v-for="(l, i) in lanes" :key="l.name" class="lane" :style="{ opacity: [...st.on].some(id => Math.round((st.pos[id]?.[1] ?? byId[id]!.l)) === i) ? 1 : 0.15 }">
         <line :x1="X0 - 70" :x2="W - 40" :y1="Y0 + i * DY" :y2="Y0 + i * DY" :stroke="l.color" />
         <text :x="24" :y="Y0 + i * DY + 7" :fill="l.color">{{ l.name }}</text>
       </g>

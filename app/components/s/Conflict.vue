@@ -22,10 +22,13 @@ const steps = [
       <div class="ed mono" dir="ltr" data-r>
         <div class="bar">
           <span>greeting.js</span>
-          <span v-if="step < 4 && step >= 0" class="warn">CONFLICT</span>
-          <span v-else class="ok">resolved</span>
+          <Transition name="fx" mode="out-in">
+            <span v-if="step < 4" key="c" class="warn">CONFLICT</span>
+            <span v-else key="r" class="ok">resolved</span>
+          </Transition>
         </div>
-        <div class="code">
+        <Transition name="fx" mode="out-in">
+        <div :key="step" class="code">
           <div v-if="step < 2" class="msg">
             <p class="r">Auto-merging greeting.js</p>
             <p class="r">CONFLICT (content): Merge conflict in greeting.js</p>
@@ -52,7 +55,8 @@ const steps = [
             <p v-if="step >= 4" class="g">$ git commit -m "merge: feature into main"</p>
           </template>
         </div>
-        <div v-if="step === 2" class="legend" dir="rtl"><span class="o">نسختك الحالية (HEAD)</span><span class="t">النسخة القادمة (feature)</span></div>
+        </Transition>
+        <Transition name="fx"><div v-if="step === 2" class="legend" dir="rtl"><span class="o">نسختك الحالية (HEAD)</span><span class="t">النسخة القادمة (feature)</span></div></Transition>
       </div>
     </div>
   </section>

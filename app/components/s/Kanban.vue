@@ -30,7 +30,7 @@ watch(() => props.step, () => { if (state && props.active) Flip.from(state, { du
     <SlideHead kicker="منهجيات العمل" :time="time" title="طريقة <em class='mono'>Kanban</em>" lead="اجعل العمل مرئيًا، وحدّد عدد المهام الجارية (WIP Limit)، وحرّك البطاقات من اليمين إلى اليسار." />
     <div ref="board" class="board" data-r>
       <div v-for="(c, ci) in cols" :key="c" class="colm">
-        <div class="ch"><b>{{ c }}</b><span v-if="ci === 1" class="wip mono">WIP ≤ 2</span><span class="cnt mono">{{ cards.filter(k => at[k.id as 'a'] === ci).length }}</span></div>
+        <div class="ch"><b>{{ c }}</b><span v-if="ci === 1" class="wip mono">WIP ≤ 2</span><Transition name="fx" mode="out-in"><span :key="cards.filter(k => at[k.id as 'a'] === ci).length" class="cnt mono">{{ cards.filter(k => at[k.id as 'a'] === ci).length }}</span></Transition></div>
         <div class="list">
           <div v-for="k in cards.filter(k => at[k.id as 'a'] === ci)" :key="k.id" class="kc" :data-flip-id="k.id" :class="{ done: ci === 2 }">
             <span class="tag">{{ k.tag }}</span>
