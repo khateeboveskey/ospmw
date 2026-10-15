@@ -59,7 +59,7 @@ const cur = computed(() => phases[props.step]!)
 .cur h3 { font-family: var(--serif); font-size: 52px; }
 .cur p { font-size: 28px; color: var(--ink-2); line-height: 1.55; }
 .wheel { position: relative; width: 840px; height: 840px; flex: none; }
-.wheel svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.wheel > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .ring { fill: none; stroke: rgba(111,214,200,.35); stroke-width: 3; stroke-dasharray: 1; }
 .orb { fill: rgba(28,157,142,.25); stroke: var(--teal-l); stroke-width: 2; }
 .node { position: absolute; translate: -50% -50%; width: 120px; height: 120px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; background: var(--navy-d); border: 1px solid var(--line); transition: all .6s var(--ease); }
