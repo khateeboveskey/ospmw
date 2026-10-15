@@ -48,7 +48,7 @@ watch(() => props.step, () => { if (state && props.active) Flip.from(state, { du
 .ch { display: flex; align-items: center; gap: 14px; font-size: 30px; }
 .wip { font-size: 17px; color: var(--amber); border: 1px solid rgba(244,194,107,.4); border-radius: 999px; padding: 3px 12px; }
 .cnt { margin-inline-start: auto; font-size: 20px; color: var(--ink-3); }
-.list { display: flex; flex-direction: column; gap: 14px; }
-.kc { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 20px 22px; border-radius: 16px; background: var(--navy); border: 1px solid rgba(255,255,255,.16); font-size: 26px; box-shadow: 0 16px 30px -18px rgba(0,0,0,.6); }
+.list { display: flex; flex-direction: column; gap: 12px; }
+.kc { display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-radius: 16px; background: var(--navy); border: 1px solid rgba(255,255,255,.16); font-size: 24px; box-shadow: 0 16px 30px -18px rgba(0,0,0,.6); }
 .kc.done { border-color: var(--teal); background: linear-gradient(135deg, rgba(28,157,142,.35), var(--navy)); }
 </style>

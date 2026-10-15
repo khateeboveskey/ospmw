@@ -23,11 +23,11 @@ const days = [
 
 <style scoped>
 .days { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; flex: 1; }
-.day { display: flex; flex-direction: column; gap: 14px; padding: 44px; }
-.n { font-family: var(--serif); font-weight: 900; font-size: 120px; line-height: 1; color: transparent; -webkit-text-stroke: 2px var(--teal-l); }
+.day { display: flex; flex-direction: column; gap: 8px; padding: 32px 36px; }
+.n { font-family: var(--serif); font-weight: 900; font-size: 84px; line-height: 1; color: transparent; -webkit-text-stroke: 2px var(--teal-l); }
 .lbl { color: var(--teal-l); font-size: 24px; font-weight: 500; }
-h3 { font-family: var(--serif); font-size: 44px; line-height: 1.25; font-weight: 700; min-height: 110px; }
-ul { list-style: none; padding: 0; margin: 10px 0 0; display: flex; flex-direction: column; gap: 14px; }
-li { font-size: 26px; color: var(--ink-2); padding-inline-start: 28px; position: relative; }
-li::before { content: ''; position: absolute; inset-inline-start: 0; top: 16px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--teal); }
+h3 { font-family: var(--serif); font-size: 36px; line-height: 1.3; font-weight: 700; min-height: 94px; }
+ul { list-style: none; padding: 0; margin: 6px 0 0; display: flex; flex-direction: column; gap: 10px; }
+li { font-size: 23px; color: var(--ink-2); padding-inline-start: 28px; position: relative; }
+li::before { content: ''; position: absolute; inset-inline-start: 0; top: 13px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--teal); }
 </style>

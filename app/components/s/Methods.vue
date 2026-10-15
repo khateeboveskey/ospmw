@@ -44,19 +44,19 @@ watch(() => [props.active, props.step] as const, ([a, s], [pa, ps]) => {
 
 <style scoped>
 .cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; flex: 1; }
-.side { display: flex; flex-direction: column; gap: 26px; }
+.side { display: flex; flex-direction: column; gap: 18px; }
 .hd { display: flex; align-items: center; gap: 18px; }
 .hd h3 { font-family: var(--mono); font-size: 46px; direction: ltr; }
-.falls { display: flex; flex-direction: column; gap: 12px; flex: 1; }
-.st { align-self: flex-start; padding: 14px 28px; border-radius: 14px; background: rgba(143,195,221,.14); border: 1px solid rgba(143,195,221,.35); font-size: 26px; position: relative; }
-.st:not(:last-child)::after { content: ''; position: absolute; inset-inline-end: -40px; top: 50%; width: 30px; height: 40px; border-top: 2px solid rgba(143,195,221,.5); border-inline-end: 2px solid rgba(143,195,221,.5); border-start-end-radius: 12px; }
+.falls { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.st { align-self: flex-start; padding: 9px 24px; border-radius: 12px; background: rgba(143,195,221,.14); border: 1px solid rgba(143,195,221,.35); font-size: 23px; position: relative; }
+.st:not(:last-child)::after { content: ''; position: absolute; inset-inline-end: -40px; top: 50%; width: 30px; height: 30px; border-top: 2px solid rgba(143,195,221,.5); border-inline-end: 2px solid rgba(143,195,221,.5); border-start-end-radius: 12px; }
 .loops { display: flex; justify-content: space-around; align-items: center; flex: 1; }
-.it { display: flex; flex-direction: column; align-items: center; gap: 26px; }
-.loop { width: 160px; height: 160px; border-radius: 50%; border: 2px dashed var(--teal-l); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+.it { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+.loop { width: 130px; height: 130px; border-radius: 50%; border: 2px dashed var(--teal-l); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
 .loop svg { width: 40px; height: 40px; color: var(--teal-l); animation: spin 6s linear infinite; }
 .loop span { font-size: 18px; color: var(--ink-2); }
 .box { background: var(--teal); border-radius: 12px; box-shadow: 0 0 40px rgba(28,157,142,.5); }
-.when { font-size: 25px; line-height: 1.6; color: var(--ink-2); }
+.when { font-size: 23px; line-height: 1.6; color: var(--ink-2); }
 .when b { color: #fff; }
 @keyframes spin { to { rotate: 360deg; } }
 </style>

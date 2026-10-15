@@ -53,18 +53,18 @@ watch(() => [props.active, props.step] as const, ([a, s]) => {
 <style scoped>
 .cmp { flex: 1; display: grid; grid-template-columns: 1fr 420px 1fr; gap: 30px; align-items: stretch; }
 .side { display: flex; flex-direction: column; gap: 18px; }
-.big { width: 110px; height: 110px; border-radius: 28px; display: grid; place-items: center; background: rgba(28,157,142,.2); color: var(--teal-l); }
-.big svg { width: 58px; height: 58px; stroke-width: 1.5; }
+.big { width: 84px; height: 84px; border-radius: 28px; display: grid; place-items: center; background: rgba(28,157,142,.2); color: var(--teal-l); }
+.big svg { width: 44px; height: 44px; stroke-width: 1.5; }
 .gh .big { background: rgba(255,255,255,.12); color: #fff; }
-.side h3 { font-size: 54px; }
-.side ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px; }
-.side li { font-size: 26px; color: var(--ink-2); }
+.side h3 { font-size: 46px; }
+.side ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.side li { font-size: 24px; color: var(--ink-2); }
 .side li::before { content: '—'; color: var(--teal-l); margin-inline-end: 12px; }
 .pipe { display: flex; flex-direction: column; justify-content: center; gap: 80px; }
 .lane { position: relative; display: flex; align-items: center; justify-content: center; gap: 12px; height: 60px; border-top: 2px dashed rgba(111,214,200,.4); font-size: 26px; color: var(--teal-l); padding-top: 20px; }
 .lane svg { width: 30px; height: 30px; }
 .pk { position: absolute; top: -9px; width: 16px; height: 16px; border-radius: 50%; background: var(--teal-l); box-shadow: 0 0 16px var(--teal-l); opacity: 0; }
 .pk.up { left: 30px; } .pk.dn { right: 30px; background: #fff; box-shadow: 0 0 16px #fff; }
-.ana { font-size: 30px; color: var(--ink-2); margin-top: 30px; text-align: center; }
+.ana { font-size: 30px; color: var(--ink-2); margin-top: 18px; text-align: center; }
 .ana b { color: #fff; font-family: var(--mono); }
 </style>
