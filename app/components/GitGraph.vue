@@ -7,8 +7,8 @@ import type { GNode, GStep } from '~/data/types'
 
 const props = defineProps<{ title?: string; lanes: { name: string; color: string }[]; nodes: GNode[]; steps: GStep[]; dx?: number; dy?: number; active: boolean; step: number }>()
 
-const DX = props.dx ?? 150
-const DY = props.dy ?? 140
+const DX = props.dx ?? 210
+const DY = props.dy ?? 150
 const X0 = 210
 const Y0 = 150
 const R = 26
