@@ -182,15 +182,15 @@ export const slides: Slide[] = [
   { c: Scrum, steps: 4, time: '4:45 – 5:45', title: 'Scrum', section: D1, props: { time: '4:45 – 5:45' }, notes: ['إطار Scrum: الـ Sprint، الـ Backlog، الاجتماعات الدورية', 'Product Backlog ← Sprint Planning ← Sprint Backlog ← Sprint (Daily Scrum) ← Increment ← Review & Retro'] },
   { c: Kanban, steps: 4, time: '4:45 – 5:45', title: 'Kanban', section: D1, props: { time: '4:45 – 5:45' }, notes: ['طريقة Kanban ولوحات المهام', 'كل ضغطة تحرك البطاقات — لاحظ WIP Limit في عمود «قيد العمل».', 'الفرق عن Scrum: لا دورات ثابتة، بل تدفق مستمر.'] },
   { c: Break, time: '5:45 – 6:00', title: 'استراحة', section: D1, props: { time: '5:45 – 6:00', back: '6:00' }, notes: ['استراحة 15 دقيقة — المؤقت يبدأ عند فتح الشريحة.'] },
-  { c: Story, steps: 9, time: '6:00 – 7:00', title: 'User Stories', section: D1, props: { time: '6:00 – 7:00' }, notes: ['كتابة User Stories ومعايير القبول', 'الضغطات 1–3: أجزاء القصة (بصفتي / أريد / حتى)', 'الضغطة 4+: معايير القبول، كل ضغطة تؤشّر معيارًا', 'معايير القبول = متى نعتبر القصة «منتهية»؟'] },
+  { c: Story, steps: 9, time: '6:00 – 7:00', title: 'User Stories', section: D1, props: { time: '6:00 – 7:00' }, notes: ['كتابة User Stories ومعايير القبول', 'الضغطات من 1 إلى 3: أجزاء القصة (بصفتي / أريد / حتى)', 'الضغطة 4+: معايير القبول، كل ضغطة تؤشّر معيارًا', 'معايير القبول = متى نعتبر القصة «منتهية»؟'] },
   { c: Points, steps: 2, time: '6:00 – 7:00', title: 'Story Points', section: D1, props: { time: '6:00 – 7:00' }, notes: ['تقسيم المهام وتقدير الوقت (Story Points)', 'نقاط نسبية تعبّر عن الجهد + التعقيد + عدم اليقين', 'ضغطة 1: Planning Poker'] },
   { c: Moscow, steps: 4, time: '6:00 – 7:00', title: 'MoSCoW', section: D1, props: { time: '6:00 – 7:00' }, notes: ['تحديد الأولويات (MoSCoW)', 'Must / Should / Could / Won\'t (now)', 'اطلب من الحضور تصنيف ميزات مشروعهم.'] },
   { c: Cards, steps: 4, time: '7:00 – 8:00', title: 'تطبيق عملي', section: D1, props: { kicker: 'تطبيق عملي', time: '7:00 – 8:00', title: 'لنبنِ <em>Backlog</em> حقيقيًا', lead: 'على GitHub Projects أو Trello — في مجموعات.', cols: 4, numbered: true, stepwise: true, cards: [
     { t: 'أنشئ اللوحة', d: 'GitHub Projects أو Trello بأعمدة: Backlog · To Do · In Progress · Done' },
-    { t: 'اكتب القصص', d: '8–10 User Stories لمشروع حقيقي، مع معايير قبول.' },
+    { t: 'اكتب القصص', d: 'من 8 إلى 10 User Stories لمشروع حقيقي، مع معايير قبول.' },
     { t: 'قدّر ورتّب', d: 'Story Points لكل قصة، ثم صنّفها بـ MoSCoW.' },
     { t: 'خطط Sprint', d: 'اختر قصص أول Sprint (أسبوعان) — ثم نقاش جماعي.' },
-  ] }, notes: ['بناء Backlog لمشروع حقيقي على GitHub Projects أو Trello', 'تخطيط Sprint أول ونقاش جماعي', 'وزّع الحضور على مجموعات من 3–4.'] },
+  ] }, notes: ['بناء Backlog لمشروع حقيقي على GitHub Projects أو Trello', 'تخطيط Sprint أول ونقاش جماعي', 'وزّع الحضور على مجموعات من 3 إلى 4 أشخاص.'] },
 
   /* ---------- Day 2 ---------- */
   { c: Divider, kind: 'divider', title: 'اليوم الثاني', section: D2, props: { n: '02', label: 'اليوم الثاني', title: '<span class="mono">Git</span><br><em>من الصفر</em>', sessions: [{ t: '4:00', name: 'مفهوم التحكم بالإصدارات' }, { t: '4:30', name: 'الأساسيات' }, { t: '5:45', name: 'الفروع والدمج' }, { t: '7:00', name: 'التراجع والتصحيح + تطبيق' }] }, notes: ['4:00 – 4:30 مفهوم التحكم بالإصدارات', '4:30 – 5:30 الأساسيات', '5:30 – 5:45 استراحة', '5:45 – 7:00 الفروع والدمج', '7:00 – 8:00 التراجع والتصحيح + تطبيق عملي', 'ملاحظة: اليوم الثاني مكتظ؛ إذا كان المشاركون مبتدئين تمامًا، يُفضّل نقل rebase إلى اليوم الثالث أو حذفه، وإعطاء وقت أطول لـ Merge Conflicts لأنها أكثر نقطة يتعثر فيها المبتدئون.'] },
@@ -229,7 +229,7 @@ export const slides: Slide[] = [
   { ...graph([gReset, gRevert], { kicker: 'التراجع والتصحيح', time: '7:00 – 8:00', title: '<span class="mono">reset</span> مقابل <em class="mono">revert</em>' }), time: '7:00 – 8:00', title: 'reset مقابل revert', section: D2, notes: ['reset يعيد كتابة التاريخ — للعمل المحلي غير المرفوع فقط', 'revert يضيف commit عكسيًا — آمن على الفروع المشتركة', 'reset --soft / --mixed / --hard: الفرق فيما يحدث للتعديلات.'] },
   { c: Cards, steps: 5, time: '7:00 – 8:00', title: 'تمرين', section: D2, props: { kicker: 'تطبيق عملي', time: '7:00 – 8:00', title: 'تمرين: تاريخ <em>نظيف</em> وفروع متعددة', cols: 5, numbered: true, stepwise: true, cards: [
     { t: 'ابدأ', d: 'مشروع صغير: صفحة شخصية', code: 'git init' },
-    { t: 'احفظ', d: '3–5 commits برسائل Conventional', code: 'git commit' },
+    { t: 'احفظ', d: 'من 3 إلى 5 commits برسائل Conventional', code: 'git commit' },
     { t: 'تفرّع', d: 'فرعان: about و contact', code: 'git switch -c' },
     { t: 'ادمج', d: 'افتعل تعارضًا… وحلّه', code: 'git merge' },
     { t: 'تحقّق', d: 'تاريخ نظيف ومقروء', code: 'git log --graph' },
