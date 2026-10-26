@@ -14,5 +14,8 @@ defineProps<{ active: boolean; step: number; kicker?: string; title: string; lea
 
 <style scoped>
 .graphs { flex: 1; min-height: 0; display: flex; gap: 70px; }
-.graphs.two > * { flex: 1; }
+.graphs.two > * { flex: 1; min-width: 0; }
+/* side by side there is no room for a caption row: stack it under the command */
+.graphs.two :deep(.foot) { flex-direction: column; align-items: stretch; gap: 14px; min-height: 165px; }
+.graphs.two :deep(.term) { min-width: 0; }
 </style>

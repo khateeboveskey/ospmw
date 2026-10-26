@@ -9,7 +9,7 @@ const days = [
 
 <template>
   <section class="slide">
-    <SlideHead kicker="محاور الورشة · 3 أيام × 4 ساعات" time="4:00 – 8:00" title="ثلاثة أيام، <em>رحلة واحدة</em>" />
+    <SlideHead kicker="محاور الورشة · 3 أيام × 3 ساعات" time="4:00 – 7:00 م" title="ثلاثة أيام، <em>رحلة واحدة</em>" />
     <div class="days">
       <article v-for="(d, i) in days" :key="d.n" class="card day" data-r>
         <div class="n">{{ d.n }}</div>

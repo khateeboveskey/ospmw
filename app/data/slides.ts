@@ -77,9 +77,29 @@ const g3way: GraphDef = {
     { refs: { feature: null }, cmd: 'git branch -d feature', say: 'بعد الدمج نحذف الفرع — والتاريخ يبقى محفوظًا.' },
   ],
 }
+const gRebase: GraphDef = {
+  title: 'git rebase', dx: 170, dy: 125,
+  lanes: [{ name: 'main', color: T }, { name: 'feature', color: W }, { name: '', color: 'rgba(255,255,255,.4)' }],
+  nodes: [{ id: 'c1', x: 0, l: 0 }, { id: 'c2', x: 1, l: 0, p: ['c1'] }, { id: 'c3', x: 2, l: 0, p: ['c2'] }, { id: 'f1', x: 2, l: 1, p: ['c2'] }, { id: 'f2', x: 3, l: 1, p: ['f1'] }, { id: "f1'", x: 3, l: 1, p: ['c3'] }, { id: "f2'", x: 4, l: 1, p: ["f1'"] }],
+  steps: [
+    { add: ['c1', 'c2', 'c3', 'f1', 'f2'], refs: { main: 'c3', feature: 'f2' }, head: 'feature', cmd: 'git log --graph --oneline', say: 'main تقدّم بعد أن تفرّعنا منه.' },
+    { add: ["f1'", "f2'"], dim: ['f1', 'f2'], pos: { f1: [2, 2], f2: [3, 2] }, refs: { feature: "f2'" }, cmd: 'git rebase main', say: 'يعيد تطبيق commits الفرع فوق آخر main — بنسخ وهويات جديدة.' },
+    { hide: ['f1', 'f2'], cmd: '# القاعدة الذهبية', say: 'تاريخ خطي نظيف — لكن لا تعمل rebase لفرع شاركته مع غيرك.' },
+  ],
+}
+const gPick: GraphDef = {
+  title: 'git cherry-pick', dx: 170, dy: 125, span: [4, 2],
+  lanes: [{ name: 'main', color: T }, { name: 'feature', color: W }],
+  nodes: [{ id: 'c1', x: 0, l: 0 }, { id: 'c2', x: 1, l: 0, p: ['c1'] }, { id: 'c3', x: 2, l: 0, p: ['c2'] }, { id: 'f1', x: 2, l: 1, p: ['c2'], c: AMB }, { id: 'f2', x: 3, l: 1, p: ['f1'] }, { id: "f1'", x: 3, l: 0, p: ['c3'], c: AMB }],
+  steps: [
+    { add: ['c1', 'c2', 'c3', 'f1', 'f2'], refs: { main: 'c3', feature: 'f2' }, head: 'main', cmd: 'git log --graph --oneline', say: 'إصلاح مهم (f1) في فرع feature، ونحتاجه في main الآن.' },
+    { add: ["f1'"], refs: { main: "f1'" }, cmd: 'git cherry-pick f1', say: 'ينسخ commit واحدًا محددًا إلى الفرع الحالي — بهوية جديدة.' },
+    { cmd: '# متى؟', say: 'مفيد لنقل hotfix بين الفروع — استخدمه باعتدال.' },
+  ],
+}
 const one = [{ name: 'main', color: T }]
 const gReset: GraphDef = {
-  title: 'git reset', lanes: one, dx: 170,
+  title: 'git reset', lanes: one, dx: 170, span: [3, 0],
   nodes: [{ id: 'c1', x: 0, l: 0 }, { id: 'c2', x: 1, l: 0, p: ['c1'] }, { id: 'c3', x: 2, l: 0, p: ['c2'], c: COR }],
   steps: [
     { add: ['c1', 'c2', 'c3'], refs: { main: 'c3' }, head: 'main', cmd: 'git log --oneline', say: 'commit خاطئ (c3) وصل إلى main.' },
@@ -147,13 +167,13 @@ const graph = (g: GraphDef[], p: Record<string, unknown>) => ({ c: Graph, props:
 
 /* ---------------- deck ---------------- */
 export const slides: Slide[] = [
-  { c: Cover, title: 'الغلاف', section: D0, notes: ['ورشة: إدارة المشاريع البرمجية مع Git و GitHub', 'المدة: 3 أيام × 4 ساعات (4:00 – 8:00 م)', 'عرّف بنفسك، واسأل المشاركين عن خبراتهم السابقة مع Git.'] },
+  { c: Cover, title: 'الغلاف', section: D0, notes: ['ورشة: إدارة المشاريع البرمجية مع Git و GitHub', 'المدة: 3 أيام × 3 ساعات (4:00 – 7:00 م)', 'عرّف بنفسك، واسأل المشاركين عن خبراتهم السابقة مع Git.'] },
   { c: Agenda, title: 'محاور الورشة', section: D0, notes: ['اليوم الأول: أساسيات إدارة المشاريع البرمجية', 'اليوم الثاني: Git من الصفر', 'اليوم الثالث: GitHub والعمل الجماعي', 'كل يوم ينتهي بتطبيق عملي.'] },
 
   /* ---------- Day 1 ---------- */
-  { c: Divider, kind: 'divider', title: 'اليوم الأول', section: D1, props: { n: '01', label: 'اليوم الأول', title: 'أساسيات إدارة<br><em>المشاريع البرمجية</em>', sessions: [{ t: '4:00', name: 'مدخل إلى إدارة المشاريع' }, { t: '4:45', name: 'منهجيات العمل' }, { t: '6:00', name: 'التخطيط وتقسيم العمل' }, { t: '7:00', name: 'تطبيق عملي' }] }, notes: ['4:00 – 4:45 مدخل إلى إدارة المشاريع البرمجية', '4:45 – 5:45 منهجيات العمل', '5:45 – 6:00 استراحة', '6:00 – 7:00 تخطيط المشروع وتقسيم العمل', '7:00 – 8:00 تطبيق عملي'] },
-  { c: Sdlc, steps: 6, time: '4:00 – 4:45', title: 'دورة حياة تطوير البرمجيات', section: D1, props: { time: '4:00 – 4:45' }, notes: ['دورة حياة تطوير البرمجيات (SDLC)', 'كل ضغطة تنتقل لمرحلة: التخطيط ← المتطلبات ← التصميم ← التطوير ← الاختبار ← النشر والصيانة', 'نبّه: الدورة تتكرر — المنتج لا "ينتهي" بعد الإطلاق.'] },
-  { c: Cards, time: '4:00 – 4:45', title: 'أسباب فشل المشاريع', section: D1, props: { kicker: 'مدخل إلى إدارة المشاريع البرمجية', time: '4:00 – 4:45', title: 'لماذا تفشل المشاريع البرمجية؟', cols: 3, cards: [
+  { c: Divider, kind: 'divider', title: 'اليوم الأول', section: D1, props: { n: '01', label: 'اليوم الأول', title: 'أساسيات إدارة<br><em>المشاريع البرمجية</em>', sessions: [{ t: '4:00', name: 'مدخل إلى إدارة المشاريع' }, { t: '4:30', name: 'منهجيات العمل' }, { t: '5:30', name: 'التخطيط وتقسيم العمل' }, { t: '6:15', name: 'تطبيق عملي' }] }, notes: ['4:00 – 4:30 مدخل إلى إدارة المشاريع البرمجية', '4:30 – 5:15 منهجيات العمل', '5:15 – 5:30 استراحة', '5:30 – 6:15 تخطيط المشروع وتقسيم العمل', '6:15 – 7:00 تطبيق عملي'] },
+  { c: Sdlc, steps: 6, time: '4:00 – 4:30', title: 'دورة حياة تطوير البرمجيات', section: D1, props: { time: '4:00 – 4:30' }, notes: ['دورة حياة تطوير البرمجيات (SDLC)', 'كل ضغطة تنتقل لمرحلة: التخطيط ← المتطلبات ← التصميم ← التطوير ← الاختبار ← النشر والصيانة', 'نبّه: الدورة تتكرر — المنتج لا "ينتهي" بعد الإطلاق.'] },
+  { c: Cards, time: '4:00 – 4:30', title: 'أسباب فشل المشاريع', section: D1, props: { kicker: 'مدخل إلى إدارة المشاريع البرمجية', time: '4:00 – 4:30', title: 'لماذا تفشل المشاريع البرمجية؟', cols: 3, cards: [
     { icon: Shuffle, t: 'متطلبات غامضة ومتغيرة', d: 'نبدأ البناء قبل أن نفهم ماذا نبني.' },
     { icon: Hourglass, t: 'تقديرات غير واقعية', d: 'وعود بمواعيد لا تأخذ المخاطر في الحسبان.' },
     { icon: Expand, t: 'تضخم النطاق', en: 'Scope Creep', d: '«ميزة صغيرة أخيرة»… تتكرر عشرين مرة.' },
@@ -161,20 +181,20 @@ export const slides: Slide[] = [
     { icon: Bug, t: 'الاختبار المتأخر', d: 'اكتشاف الأخطاء في النهاية يضاعف تكلفتها.' },
     { icon: EyeOff, t: 'غياب الشفافية', d: 'لا أحد يعرف أين وصلنا فعلًا.' },
   ] }, notes: ['أسباب فشل المشاريع البرمجية الشائعة', 'اسأل الحضور: من عاش مشروعًا فشل؟ ولماذا؟', 'اربط كل سبب بأداة سنتعلمها: User Stories، Story Points، MoSCoW، Kanban، Git.'] },
-  { c: Cards, time: '4:00 – 4:45', title: 'أدوار الفريق', section: D1, props: { kicker: 'مدخل إلى إدارة المشاريع البرمجية', time: '4:00 – 4:45', title: 'أدوار الفريق', cols: 4, cards: [
+  { c: Cards, time: '4:00 – 4:30', title: 'أدوار الفريق', section: D1, props: { kicker: 'مدخل إلى إدارة المشاريع البرمجية', time: '4:00 – 4:30', title: 'أدوار الفريق', cols: 4, cards: [
     { icon: Target, t: 'مالك المنتج', en: 'Product Owner', d: 'يحدد <b>ماذا</b> نبني و<b>لماذا</b>، ويرتّب الأولويات.' },
     { icon: CodeXml, t: 'المطوّر', en: 'Developer', d: 'يقدّر الجهد ويحوّل القصص إلى كود يعمل.' },
     { icon: ShieldCheck, t: 'ضمان الجودة', en: 'QA', d: 'يتحقق أن المنتج يعمل كما يجب، ويكتشف الأخطاء مبكرًا.' },
     { icon: Compass, t: 'قائد الفريق', en: 'Team Lead', d: 'يوجّه تقنيًا، يزيل العوائق، ويحافظ على جودة الكود.' },
   ] }, notes: ['أدوار الفريق: Product Owner، Developer، QA، Team Lead', 'في الفرق الصغيرة قد يحمل الشخص أكثر من دور.'] },
-  { c: Methods, steps: 3, time: '4:45 – 5:45', title: 'Waterfall مقابل Agile', section: D1, props: { time: '4:45 – 5:45' }, notes: ['Waterfall مقابل Agile: متى يصلح كل منهما', 'ضغطة 1: Agile بدورات قصيرة ومنتج ينمو', 'ضغطة 2: متى يصلح كل منهما'] },
-  { c: Scrum, steps: 4, time: '4:45 – 5:45', title: 'Scrum', section: D1, props: { time: '4:45 – 5:45' }, notes: ['إطار Scrum: الـ Sprint، الـ Backlog، الاجتماعات الدورية', 'Product Backlog ← Sprint Planning ← Sprint Backlog ← Sprint (Daily Scrum) ← Increment ← Review & Retro'] },
-  { c: Kanban, steps: 4, time: '4:45 – 5:45', title: 'Kanban', section: D1, props: { time: '4:45 – 5:45' }, notes: ['طريقة Kanban ولوحات المهام', 'كل ضغطة تحرك البطاقات — لاحظ WIP Limit في عمود «قيد العمل».', 'الفرق عن Scrum: لا دورات ثابتة، بل تدفق مستمر.'] },
-  { c: Break, time: '5:45 – 6:00', title: 'استراحة', section: D1, props: { time: '5:45 – 6:00', back: '6:00' }, notes: ['استراحة 15 دقيقة — المؤقت يبدأ عند فتح الشريحة.'] },
-  { c: Story, steps: 9, time: '6:00 – 7:00', title: 'User Stories', section: D1, props: { time: '6:00 – 7:00' }, notes: ['كتابة User Stories ومعايير القبول', 'الضغطات من 1 إلى 3: أجزاء القصة (بصفتي / أريد / حتى)', 'الضغطة 4+: معايير القبول، كل ضغطة تؤشّر معيارًا', 'معايير القبول = متى نعتبر القصة «منتهية»؟'] },
-  { c: Points, steps: 2, time: '6:00 – 7:00', title: 'Story Points', section: D1, props: { time: '6:00 – 7:00' }, notes: ['تقسيم المهام وتقدير الوقت (Story Points)', 'نقاط نسبية تعبّر عن الجهد + التعقيد + عدم اليقين', 'ضغطة 1: Planning Poker'] },
-  { c: Moscow, steps: 4, time: '6:00 – 7:00', title: 'MoSCoW', section: D1, props: { time: '6:00 – 7:00' }, notes: ['تحديد الأولويات (MoSCoW)', 'Must / Should / Could / Won\'t (now)', 'اطلب من الحضور تصنيف ميزات مشروعهم.'] },
-  { c: Cards, steps: 4, time: '7:00 – 8:00', title: 'تطبيق عملي', section: D1, props: { kicker: 'تطبيق عملي', time: '7:00 – 8:00', title: 'لنبنِ <em>Backlog</em> حقيقيًا', lead: 'على GitHub Projects أو Trello — في مجموعات.', cols: 4, numbered: true, stepwise: true, cards: [
+  { c: Methods, steps: 3, time: '4:30 – 5:15', title: 'Waterfall مقابل Agile', section: D1, props: { time: '4:30 – 5:15' }, notes: ['Waterfall مقابل Agile: متى يصلح كل منهما', 'ضغطة 1: Agile بدورات قصيرة ومنتج ينمو', 'ضغطة 2: متى يصلح كل منهما'] },
+  { c: Scrum, steps: 4, time: '4:30 – 5:15', title: 'Scrum', section: D1, props: { time: '4:30 – 5:15' }, notes: ['إطار Scrum: الـ Sprint، الـ Backlog، الاجتماعات الدورية', 'Product Backlog ← Sprint Planning ← Sprint Backlog ← Sprint (Daily Scrum) ← Increment ← Review & Retro'] },
+  { c: Kanban, steps: 4, time: '4:30 – 5:15', title: 'Kanban', section: D1, props: { time: '4:30 – 5:15' }, notes: ['طريقة Kanban ولوحات المهام', 'كل ضغطة تحرك البطاقات — لاحظ WIP Limit في عمود «قيد العمل».', 'الفرق عن Scrum: لا دورات ثابتة، بل تدفق مستمر.'] },
+  { c: Break, time: '5:15 – 5:30', title: 'استراحة', section: D1, props: { time: '5:15 – 5:30', back: '5:30' }, notes: ['استراحة 15 دقيقة — المؤقت يبدأ عند فتح الشريحة.'] },
+  { c: Story, steps: 9, time: '5:30 – 6:15', title: 'User Stories', section: D1, props: { time: '5:30 – 6:15' }, notes: ['كتابة User Stories ومعايير القبول', 'الضغطات من 1 إلى 3: أجزاء القصة (بصفتي / أريد / حتى)', 'الضغطة 4+: معايير القبول، كل ضغطة تؤشّر معيارًا', 'معايير القبول = متى نعتبر القصة «منتهية»؟'] },
+  { c: Points, steps: 2, time: '5:30 – 6:15', title: 'Story Points', section: D1, props: { time: '5:30 – 6:15' }, notes: ['تقسيم المهام وتقدير الوقت (Story Points)', 'نقاط نسبية تعبّر عن الجهد + التعقيد + عدم اليقين', 'ضغطة 1: Planning Poker'] },
+  { c: Moscow, steps: 4, time: '5:30 – 6:15', title: 'MoSCoW', section: D1, props: { time: '5:30 – 6:15' }, notes: ['تحديد الأولويات (MoSCoW)', 'Must / Should / Could / Won\'t (now)', 'اطلب من الحضور تصنيف ميزات مشروعهم.'] },
+  { c: Cards, steps: 4, time: '6:15 – 7:00', title: 'تطبيق عملي', section: D1, props: { kicker: 'تطبيق عملي', time: '6:15 – 7:00', title: 'لنبنِ <em>Backlog</em> حقيقيًا', lead: 'على GitHub Projects أو Trello — في مجموعات.', cols: 4, numbered: true, stepwise: true, cards: [
     { t: 'أنشئ اللوحة', d: 'GitHub Projects أو Trello بأعمدة: Backlog · To Do · In Progress · Done' },
     { t: 'اكتب القصص', d: 'من 8 إلى 10 User Stories لمشروع حقيقي، مع معايير قبول.' },
     { t: 'قدّر ورتّب', d: 'Story Points لكل قصة، ثم صنّفها بـ MoSCoW.' },
@@ -182,18 +202,18 @@ export const slides: Slide[] = [
   ] }, notes: ['بناء Backlog لمشروع حقيقي على GitHub Projects أو Trello', 'تخطيط Sprint أول ونقاش جماعي', 'وزّع الحضور على مجموعات من 3 إلى 4 أشخاص.'] },
 
   /* ---------- Day 2 ---------- */
-  { c: Divider, kind: 'divider', title: 'اليوم الثاني', section: D2, props: { n: '02', label: 'اليوم الثاني', title: '<span class="mono">Git</span><br><em>من الصفر</em>', sessions: [{ t: '4:00', name: 'مفهوم التحكم بالإصدارات' }, { t: '4:30', name: 'الأساسيات' }, { t: '5:45', name: 'الفروع والدمج' }, { t: '7:00', name: 'التراجع والتصحيح + تطبيق' }] }, notes: ['4:00 – 4:30 مفهوم التحكم بالإصدارات', '4:30 – 5:30 الأساسيات', '5:30 – 5:45 استراحة', '5:45 – 7:00 الفروع والدمج', '7:00 – 8:00 التراجع والتصحيح + تطبيق عملي', 'أعطِ Merge Conflicts وقتًا كافيًا — أكثر نقطة يتعثر فيها المبتدئون.'] },
-  { c: Vcs, steps: 2, time: '4:00 – 4:30', title: 'لماذا Version Control؟', section: D2, props: { time: '4:00 – 4:30' }, notes: ['ما المشكلة التي يحلها Version Control', 'ضغطة 1: الفوضى تتحول إلى تاريخ منظم — من، متى، لماذا.'] },
-  { c: GitHub, steps: 3, time: '4:00 – 4:30', title: 'Git مقابل GitHub', section: D2, props: { time: '4:00 – 4:30' }, notes: ['Git مقابل GitHub: الفرق الجوهري', 'Git أداة محلية — GitHub منصة استضافة وتعاون', 'بدائل GitHub: GitLab، Bitbucket — كلها تستخدم Git.'] },
-  { c: Terminal, steps: 5, time: '4:30 – 5:30', title: 'git config', section: D2, props: { kicker: 'الأساسيات', time: '4:30 – 5:30', title: 'التثبيت والإعداد', path: '~', items: [
+  { c: Divider, kind: 'divider', title: 'اليوم الثاني', section: D2, props: { n: '02', label: 'اليوم الثاني', title: '<span class="mono">Git</span><br><em>من الصفر</em>', sessions: [{ t: '4:00', name: 'مفهوم التحكم بالإصدارات' }, { t: '4:20', name: 'الأساسيات' }, { t: '5:20', name: 'الفروع والدمج' }, { t: '6:15', name: 'التراجع والتصحيح + تطبيق' }] }, notes: ['4:00 – 4:20 مفهوم التحكم بالإصدارات', '4:20 – 5:05 الأساسيات', '5:05 – 5:20 استراحة', '5:20 – 6:15 الفروع والدمج', '6:15 – 7:00 التراجع والتصحيح + تطبيق عملي', 'أعطِ Merge Conflicts وقتًا كافيًا — أكثر نقطة يتعثر فيها المبتدئون.'] },
+  { c: Vcs, steps: 2, time: '4:00 – 4:20', title: 'لماذا Version Control؟', section: D2, props: { time: '4:00 – 4:20' }, notes: ['ما المشكلة التي يحلها Version Control', 'ضغطة 1: الفوضى تتحول إلى تاريخ منظم — من، متى، لماذا.'] },
+  { c: GitHub, steps: 3, time: '4:00 – 4:20', title: 'Git مقابل GitHub', section: D2, props: { time: '4:00 – 4:20' }, notes: ['Git مقابل GitHub: الفرق الجوهري', 'Git أداة محلية — GitHub منصة استضافة وتعاون', 'بدائل GitHub: GitLab، Bitbucket — كلها تستخدم Git.'] },
+  { c: Terminal, steps: 5, time: '4:20 – 5:05', title: 'git config', section: D2, props: { kicker: 'الأساسيات', time: '4:20 – 5:05', title: 'التثبيت والإعداد', path: '~', items: [
     { label: 'git --version', cmd: 'git --version', out: ['git version 2.47.0'], note: 'تأكد من التثبيت. Windows: Git for Windows · macOS: brew install git' },
     { label: 'user.name', cmd: 'git config --global user.name "Sara Ahmed"', note: 'اسمك كما سيظهر في كل commit.' },
     { label: 'user.email', cmd: 'git config --global user.email "sara@example.com"', note: 'استخدم نفس البريد المسجّل في GitHub.' },
     { label: 'init.defaultBranch', cmd: 'git config --global init.defaultBranch main', note: 'اسم الفرع الافتراضي في المستودعات الجديدة.' },
     { label: 'git config --list', cmd: 'git config --list', out: ['user.name=Sara Ahmed', 'user.email=sara@example.com', 'init.defaultbranch=main'], note: 'راجع إعداداتك في أي وقت.' },
   ] }, notes: ['التثبيت والإعداد: git config', 'تأكد أن الجميع ثبّت Git قبل المتابعة.'] },
-  { c: Areas, steps: 5, time: '4:30 – 5:30', title: 'المناطق الثلاث', section: D2, props: { time: '4:30 – 5:30' }, notes: ['المناطق الثلاث: Working Directory، Staging، Repository', 'تشبيه: Staging = عربة التسوق قبل الدفع، commit = الفاتورة.', 'كل ضغطة تنفّذ أمرًا وتحرّك الملفات بين المناطق.'] },
-  { c: Terminal, steps: 6, time: '4:30 – 5:30', title: 'الأوامر الأساسية', section: D2, props: { kicker: 'الأساسيات', time: '4:30 – 5:30', title: 'الأوامر الأساسية', items: [
+  { c: Areas, steps: 5, time: '4:20 – 5:05', title: 'المناطق الثلاث', section: D2, props: { time: '4:20 – 5:05' }, notes: ['المناطق الثلاث: Working Directory، Staging، Repository', 'تشبيه: Staging = عربة التسوق قبل الدفع، commit = الفاتورة.', 'كل ضغطة تنفّذ أمرًا وتحرّك الملفات بين المناطق.'] },
+  { c: Terminal, steps: 6, time: '4:20 – 5:05', title: 'الأوامر الأساسية', section: D2, props: { kicker: 'الأساسيات', time: '4:20 – 5:05', title: 'الأوامر الأساسية', items: [
     { label: 'init', cmd: 'git init', out: ['Initialized empty Git repository in ~/my-app/.git/'], note: 'يحوّل المجلد إلى مستودع Git (ينشئ مجلد ‎.git المخفي).' },
     { label: 'status', cmd: 'git status', out: ['On branch main', 'Untracked files:', '  <span class="r">index.html</span>'], note: 'سؤالك الدائم: ماذا تغيّر؟ وما الموجود في منطقة التجهيز؟' },
     { label: 'add', cmd: 'git add index.html', note: 'ينقل التعديلات إلى منطقة التجهيز.' },
@@ -201,21 +221,21 @@ export const slides: Slide[] = [
     { label: 'log', cmd: 'git log --oneline', out: ['<span class="y">e7b21d4</span> fix: correct page title', '<span class="y">a1f3c2e</span> feat: add homepage'], note: 'تاريخ المشروع: من غيّر؟ متى؟ ولماذا؟' },
     { label: 'diff', cmd: 'git diff', out: ['<span class="d">--- a/index.html</span>', '<span class="d">+++ b/index.html</span>', '<span class="r">-  &lt;h1&gt;Hello&lt;/h1&gt;</span>', '<span class="g">+  &lt;h1&gt;Welcome&lt;/h1&gt;</span>'], note: 'يعرض الفروقات سطرًا بسطر قبل الحفظ.' },
   ] }, notes: ['الأوامر: init، status، add، commit، log، diff', 'نفّذها حيًّا مع الحضور بعد العرض.'] },
-  { c: Commits, steps: 3, time: '4:30 – 5:30', title: 'Conventional Commits', section: D2, props: { time: '4:30 – 5:30' }, notes: ['كتابة Commit Messages احترافية (Conventional Commits)', 'type(scope): description', 'الرسالة تشرح «لماذا» — الكود يشرح «كيف».'] },
-  { c: Break, time: '5:30 – 5:45', title: 'استراحة', section: D2, props: { time: '5:30 – 5:45', back: '5:45' }, notes: ['استراحة 15 دقيقة.'] },
-  { ...graph([gBranch], { kicker: 'الفروع والدمج', time: '5:45 – 7:00', title: 'الفروع: <span class="mono">branch</span> و <em class="mono">switch</em>' }), time: '5:45 – 7:00', title: 'الفروع', section: D2, notes: ['إنشاء الفروع والتنقل: branch، switch، checkout', 'git switch -c feature = إنشاء + انتقال في أمر واحد', 'checkout هو الأمر القديم متعدد الاستخدامات؛ switch و restore أوضح.'] },
-  { ...graph([gFF], { kicker: 'الفروع والدمج', time: '5:45 – 7:00', title: 'الدمج: <em class="mono">Fast-forward</em>' }), time: '5:45 – 7:00', title: 'Fast-forward', section: D2, notes: ['الدمج: merge وأنواعه — Fast-forward', 'يحدث عندما لا يتقدم الفرع الهدف بعد التفرع.'] },
-  { ...graph([g3way], { kicker: 'الفروع والدمج', time: '5:45 – 7:00', title: 'الدمج الثلاثي: <em class="mono">3-way merge</em>' }), time: '5:45 – 7:00', title: '3-way merge', section: D2, notes: ['الدمج الثلاثي: النسختان + الأصل المشترك', 'ينتج merge commit له أبوان.'] },
-  { c: Conflict, steps: 5, time: '5:45 – 7:00', title: 'Merge Conflicts', section: D2, props: { time: '5:45 – 7:00' }, notes: ['حل Merge Conflicts خطوة بخطوة', 'أكثر نقطة يتعثر فيها المبتدئون — أعطها وقتًا كافيًا وجرّبها حيًّا.', 'التعارض يحدث عندما يعدّل فرعان نفس السطر.'] },
-  { c: Terminal, steps: 5, time: '7:00 – 8:00', title: 'التراجع والتصحيح', section: D2, props: { kicker: 'التراجع والتصحيح', time: '7:00 – 8:00', title: 'التراجع: <span class="mono">restore</span> و <span class="mono">stash</span>', items: [
+  { c: Commits, steps: 3, time: '4:20 – 5:05', title: 'Conventional Commits', section: D2, props: { time: '4:20 – 5:05' }, notes: ['كتابة Commit Messages احترافية (Conventional Commits)', 'type(scope): description', 'الرسالة تشرح «لماذا» — الكود يشرح «كيف».'] },
+  { c: Break, time: '5:05 – 5:20', title: 'استراحة', section: D2, props: { time: '5:05 – 5:20', back: '5:20' }, notes: ['استراحة 15 دقيقة.'] },
+  { ...graph([gBranch], { kicker: 'الفروع والدمج', time: '5:20 – 6:15', title: 'الفروع: <span class="mono">branch</span> و <em class="mono">switch</em>' }), time: '5:20 – 6:15', title: 'الفروع', section: D2, notes: ['إنشاء الفروع والتنقل: branch، switch، checkout', 'git switch -c feature = إنشاء + انتقال في أمر واحد', 'checkout هو الأمر القديم متعدد الاستخدامات؛ switch و restore أوضح.'] },
+  { ...graph([gFF], { kicker: 'الفروع والدمج', time: '5:20 – 6:15', title: 'الدمج: <em class="mono">Fast-forward</em>' }), time: '5:20 – 6:15', title: 'Fast-forward', section: D2, notes: ['الدمج: merge وأنواعه — Fast-forward', 'يحدث عندما لا يتقدم الفرع الهدف بعد التفرع.'] },
+  { ...graph([g3way], { kicker: 'الفروع والدمج', time: '5:20 – 6:15', title: 'الدمج الثلاثي: <em class="mono">3-way merge</em>' }), time: '5:20 – 6:15', title: '3-way merge', section: D2, notes: ['الدمج الثلاثي: النسختان + الأصل المشترك', 'ينتج merge commit له أبوان.'] },
+  { c: Conflict, steps: 5, time: '5:20 – 6:15', title: 'Merge Conflicts', section: D2, props: { time: '5:20 – 6:15' }, notes: ['حل Merge Conflicts خطوة بخطوة', 'أكثر نقطة يتعثر فيها المبتدئون — أعطها وقتًا كافيًا وجرّبها حيًّا.', 'التعارض يحدث عندما يعدّل فرعان نفس السطر.'] },
+  { c: Terminal, steps: 5, time: '6:15 – 7:00', title: 'التراجع والتصحيح', section: D2, props: { kicker: 'التراجع والتصحيح', time: '6:15 – 7:00', title: 'التراجع: <span class="mono">restore</span> و <span class="mono">stash</span>', items: [
     { label: 'git restore app.js', cmd: 'git restore app.js', out: ['<span class="d"># تعديلات app.js غير المحفوظة اختفت</span>'], note: 'يتراجع عن تعديلات ملف في مجلد العمل (قبل add).' },
     { label: 'git restore --staged', cmd: 'git restore --staged app.js', out: ['<span class="d"># app.js خرج من منطقة التجهيز، والتعديلات باقية</span>'], note: 'يُخرج الملف من منطقة التجهيز دون حذف تعديلاتك.' },
     { label: 'git stash', cmd: 'git stash', out: ['Saved working directory and index state WIP on main: e7b21d4'], note: 'يخبّئ تعديلاتك مؤقتًا لتنتقل إلى فرع آخر بنظافة.' },
     { label: 'git stash pop', cmd: 'git stash pop', out: ['On branch main', 'Changes not staged for commit:', '  <span class="y">modified:   style.css</span>', 'Dropped refs/stash@{0}'], note: 'يعيد التعديلات المخبّأة.' },
     { label: '.gitignore', cmd: 'cat .gitignore', out: ['node_modules/', '.env', '*.log', 'dist/'], note: 'ملفات لا نريد أن يتتبعها Git أبدًا: الأسرار، المكتبات، والملفات المولّدة.' },
   ] }, notes: ['restore، stash، ملف .gitignore', 'تحذير: لا ترفع ملف .env أبدًا.'] },
-  { ...graph([gReset, gRevert], { kicker: 'التراجع والتصحيح', time: '7:00 – 8:00', title: '<span class="mono">reset</span> مقابل <em class="mono">revert</em>' }), time: '7:00 – 8:00', title: 'reset مقابل revert', section: D2, notes: ['reset يعيد كتابة التاريخ — للعمل المحلي غير المرفوع فقط', 'revert يضيف commit عكسيًا — آمن على الفروع المشتركة', 'reset --soft / --mixed / --hard: الفرق فيما يحدث للتعديلات.'] },
-  { c: Cards, steps: 5, time: '7:00 – 8:00', title: 'تمرين', section: D2, props: { kicker: 'تطبيق عملي', time: '7:00 – 8:00', title: 'تمرين: تاريخ <em>نظيف</em> وفروع متعددة', cols: 5, numbered: true, stepwise: true, cards: [
+  { ...graph([gReset, gRevert], { kicker: 'التراجع والتصحيح', time: '6:15 – 7:00', title: '<span class="mono">reset</span> مقابل <em class="mono">revert</em>' }), time: '6:15 – 7:00', title: 'reset مقابل revert', section: D2, notes: ['reset يعيد كتابة التاريخ — للعمل المحلي غير المرفوع فقط', 'revert يضيف commit عكسيًا — آمن على الفروع المشتركة', 'reset --soft / --mixed / --hard: الفرق فيما يحدث للتعديلات.'] },
+  { c: Cards, steps: 5, time: '6:15 – 7:00', title: 'تمرين', section: D2, props: { kicker: 'تطبيق عملي', time: '6:15 – 7:00', title: 'تمرين: تاريخ <em>نظيف</em> وفروع متعددة', cols: 5, numbered: true, stepwise: true, cards: [
     { t: 'ابدأ', d: 'مشروع صغير: صفحة شخصية', code: 'git init' },
     { t: 'احفظ', d: 'من 3 إلى 5 commits برسائل Conventional', code: 'git commit' },
     { t: 'تفرّع', d: 'فرعان: about و contact', code: 'git switch -c' },
@@ -224,22 +244,23 @@ export const slides: Slide[] = [
   ] }, notes: ['تمرين: بناء مشروع صغير بتاريخ commits نظيف وفروع متعددة', 'تجوّل بين المشاركين — ساعد في حل التعارضات.'] },
 
   /* ---------- Day 3 ---------- */
-  { c: Divider, kind: 'divider', title: 'اليوم الثالث', section: D3, props: { n: '03', label: 'اليوم الثالث', title: '<span class="mono">GitHub</span><br><em>والعمل الجماعي</em>', sessions: [{ t: '4:00', name: 'المستودعات البعيدة' }, { t: '4:45', name: 'سير العمل الجماعي' }, { t: '6:00', name: 'أدوات الإدارة في GitHub' }, { t: '6:45', name: 'المشروع الختامي' }] }, notes: ['4:00 – 4:45 التعامل مع المستودعات البعيدة', '4:45 – 5:45 سير العمل الجماعي', '5:45 – 6:00 استراحة', '6:00 – 6:45 أدوات الإدارة في GitHub', '6:45 – 8:00 المشروع الختامي'] },
-  { c: Remotes, steps: 6, time: '4:00 – 4:45', title: 'المستودعات البعيدة', section: D3, props: { time: '4:00 – 4:45' }, notes: ['إنشاء مستودع وربطه: remote، push، pull، fetch، clone', 'fetch آمن دائمًا؛ pull = fetch + merge.'] },
-  { c: Auth, steps: 3, time: '4:00 – 4:45', title: 'المصادقة', section: D3, props: { time: '4:00 – 4:45' }, notes: ['المصادقة عبر SSH و Personal Access Tokens', 'GitHub لم يعد يقبل كلمة المرور عبر HTTPS.', 'اختبر SSH: ssh -T git@github.com'] },
-  { ...graph([gGhFlow], { kicker: 'سير العمل الجماعي', time: '4:45 – 5:45', title: 'استراتيجية <em class="mono">GitHub Flow</em>' }), time: '4:45 – 5:45', title: 'GitHub Flow', section: D3, notes: ['استراتيجيات الفروع: GitHub Flow', 'main + فروع قصيرة + Pull Requests'] },
-  { ...graph([gGitFlow], { kicker: 'سير العمل الجماعي', time: '4:45 – 5:45', title: 'استراتيجية <em class="mono">Git Flow</em>' }), time: '4:45 – 5:45', title: 'Git Flow', section: D3, notes: ['استراتيجيات الفروع: Git Flow', 'main · develop · feature · release · hotfix', 'قارن: GitHub Flow للنشر المستمر، Git Flow للإصدارات المجدولة.'] },
-  { c: PullRequest, steps: 6, time: '4:45 – 5:45', title: 'Pull Requests', section: D3, props: { time: '4:45 – 5:45' }, notes: ['Pull Requests: الإنشاء، الوصف، الربط بالـ Issues', 'كلمة Closes #17 في الوصف تغلق الـ Issue تلقائيًا عند الدمج.'] },
-  { c: Cards, time: '4:45 – 5:45', title: 'Code Review', section: D3, props: { kicker: 'سير العمل الجماعي', time: '4:45 – 5:45', title: '<em class="mono">Code Review</em>: كيف تراجع، وكيف تستقبل', cols: 2, cards: [
+  { c: Divider, kind: 'divider', title: 'اليوم الثالث', section: D3, props: { n: '03', label: 'اليوم الثالث', title: '<span class="mono">GitHub</span><br><em>والعمل الجماعي</em>', sessions: [{ t: '4:00', name: 'المستودعات البعيدة' }, { t: '4:30', name: 'سير العمل الجماعي' }, { t: '5:30', name: 'أدوات الإدارة في GitHub' }, { t: '6:00', name: 'المشروع الختامي' }] }, notes: ['4:00 – 4:30 التعامل مع المستودعات البعيدة', '4:30 – 5:15 سير العمل الجماعي', '5:15 – 5:30 استراحة', '5:30 – 6:00 أدوات الإدارة في GitHub', '6:00 – 7:00 المشروع الختامي'] },
+  { c: Remotes, steps: 6, time: '4:00 – 4:30', title: 'المستودعات البعيدة', section: D3, props: { time: '4:00 – 4:30' }, notes: ['إنشاء مستودع وربطه: remote، push، pull، fetch، clone', 'fetch آمن دائمًا؛ pull = fetch + merge.'] },
+  { c: Auth, steps: 3, time: '4:00 – 4:30', title: 'المصادقة', section: D3, props: { time: '4:00 – 4:30' }, notes: ['المصادقة عبر SSH و Personal Access Tokens', 'GitHub لم يعد يقبل كلمة المرور عبر HTTPS.', 'اختبر SSH: ssh -T git@github.com'] },
+  { ...graph([gGhFlow], { kicker: 'سير العمل الجماعي', time: '4:30 – 5:15', title: 'استراتيجية <em class="mono">GitHub Flow</em>' }), time: '4:30 – 5:15', title: 'GitHub Flow', section: D3, notes: ['استراتيجيات الفروع: GitHub Flow', 'main + فروع قصيرة + Pull Requests'] },
+  { ...graph([gGitFlow], { kicker: 'سير العمل الجماعي', time: '4:30 – 5:15', title: 'استراتيجية <em class="mono">Git Flow</em>' }), time: '4:30 – 5:15', title: 'Git Flow', section: D3, notes: ['استراتيجيات الفروع: Git Flow', 'main · develop · feature · release · hotfix', 'قارن: GitHub Flow للنشر المستمر، Git Flow للإصدارات المجدولة.'] },
+  { c: PullRequest, steps: 6, time: '4:30 – 5:15', title: 'Pull Requests', section: D3, props: { time: '4:30 – 5:15' }, notes: ['Pull Requests: الإنشاء، الوصف، الربط بالـ Issues', 'كلمة Closes #17 في الوصف تغلق الـ Issue تلقائيًا عند الدمج.'] },
+  { c: Cards, time: '4:30 – 5:15', title: 'Code Review', section: D3, props: { kicker: 'سير العمل الجماعي', time: '4:30 – 5:15', title: '<em class="mono">Code Review</em>: كيف تراجع، وكيف تستقبل', cols: 2, cards: [
     { icon: UserCheck, t: 'راجِع الكود لا الشخص', en: 'reviewer', d: 'بدل «كودك سيئ»: «ماذا لو استخدمنا دالة هنا لتجنب التكرار؟»' },
     { icon: MessageSquareText, t: 'كن محددًا واقترح بديلًا', en: 'reviewer', d: 'اشرح السبب، وميّز بين الضروري والاقتراح (nit).' },
     { icon: Heart, t: 'لا تأخذها بشكل شخصي', en: 'author', d: 'الملاحظة على الكود، والهدف منتج أفضل للجميع.' },
     { icon: Minimize2, t: 'PR صغير = مراجعة أفضل', en: 'author', d: 'فرق صغيرة، وصف واضح، وصور للتغييرات المرئية.' },
   ] }, notes: ['Code Review: كيف تراجع وكيف تستقبل الملاحظات', 'جرّبوا: كل شخص يراجع PR زميله في المشروع الختامي.'] },
-  { c: Fork, steps: 5, time: '4:45 – 5:45', title: 'Fork', section: D3, props: { time: '4:45 – 5:45' }, notes: ['Fork والمساهمة في المشاريع مفتوحة المصدر', 'git remote add upstream <url> لمتابعة المشروع الأصلي', 'ابحث عن وسم good first issue للبداية.'] },
-  { c: Break, time: '5:45 – 6:00', title: 'استراحة', section: D3, props: { time: '5:45 – 6:00', back: '6:00' }, notes: ['استراحة 15 دقيقة.'] },
-  { c: Tools, steps: 4, time: '6:00 – 6:45', title: 'Issues و Milestones', section: D3, props: { time: '6:00 – 6:45' }, notes: ['Issues و Labels و Milestones', 'GitHub Projects وربطها بما تم في اليوم الأول'] },
-  { c: Actions, steps: 2, time: '6:00 – 6:45', title: 'Branch Protection و Actions', section: D3, props: { time: '6:00 – 6:45' }, notes: ['حماية الفروع (Branch Protection Rules)', 'لمحة عن GitHub Actions (CI/CD)'] },
-  { ...graph([gTeam], { kicker: 'المشروع الختامي', time: '6:45 – 8:00', title: 'محاكاة <em>فريق حقيقي</em>', lead: 'كل عضو يعمل على فرع، يفتح PR، يراجع زميله، ويحل التعارضات.' }), time: '6:45 – 8:00', title: 'المشروع الختامي', section: D3, notes: ['محاكاة فريق حقيقي: توزيع المشاركين على فرق', 'كل عضو يعمل على فرع، يفتح PR، يراجع زميله، ويحل التعارضات', 'عرض النتائج وختام الورشة'] },
+  { c: Fork, steps: 5, time: '4:30 – 5:15', title: 'Fork', section: D3, props: { time: '4:30 – 5:15' }, notes: ['Fork والمساهمة في المشاريع مفتوحة المصدر', 'git remote add upstream <url> لمتابعة المشروع الأصلي', 'ابحث عن وسم good first issue للبداية.'] },
+  { c: Break, time: '5:15 – 5:30', title: 'استراحة', section: D3, props: { time: '5:15 – 5:30', back: '5:30' }, notes: ['استراحة 15 دقيقة.'] },
+  { c: Tools, steps: 4, time: '5:30 – 6:00', title: 'Issues و Milestones', section: D3, props: { time: '5:30 – 6:00' }, notes: ['Issues و Labels و Milestones', 'GitHub Projects وربطها بما تم في اليوم الأول'] },
+  { c: Actions, steps: 2, time: '5:30 – 6:00', title: 'Branch Protection و Actions', section: D3, props: { time: '5:30 – 6:00' }, notes: ['حماية الفروع (Branch Protection Rules)', 'لمحة عن GitHub Actions (CI/CD)'] },
+  { ...graph([gTeam], { kicker: 'المشروع الختامي', time: '6:00 – 7:00', title: 'محاكاة <em>فريق حقيقي</em>' }), time: '6:00 – 7:00', title: 'المشروع الختامي', section: D3, notes: ['محاكاة فريق حقيقي: توزيع المشاركين على فرق', 'كل عضو يعمل على فرع، يفتح PR، يراجع زميله، ويحل التعارضات', 'عرض النتائج وختام الورشة'] },
+  { ...graph([gRebase, gPick], { kicker: 'للاستزادة', title: '<em class="mono">rebase</em> و <em class="mono">cherry-pick</em>' }), title: 'للاستزادة', section: 'للاستزادة', notes: ['خارج المنهج الأساسي — للمهتمين بعد الورشة', 'rebase: يعيد كتابة التاريخ ليصبح خطيًا — للفروع المحلية غير المشتركة فقط', 'cherry-pick: ينقل commit بعينه إلى فرع آخر — مفيد للـ hotfix'] },
   { c: Closing, title: 'الختام', section: 'ختام', notes: ['شكر الحضور، أسئلة مفتوحة، مصادر للاستزادة: git-scm.com/book · docs.github.com · learngitbranching.js.org'] },
 ]

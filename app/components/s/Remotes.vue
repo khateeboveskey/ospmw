@@ -13,15 +13,17 @@ const plan: { local: C[]; remote: C[]; dir: 0 | 1 | -1; cmd: string; say: string
 ]
 const s = computed(() => plan[Math.min(props.step, plan.length - 1)]!)
 const wire = ref<HTMLElement>()
-const typed = ref('')
-let typing: gsap.core.Tween | null = null
-watch(() => [props.active, props.step] as const, ([a]) => {
+const { typed, type } = useTyper()
+watch(() => [props.active, props.step] as const, ([a], [pa]) => {
   if (!a) return
-  const full = s.value.cmd; const o = { n: 0 }
-  typing?.kill()
-  typing = gsap.to(o, { n: full.length, duration: Math.min(1.2, full.length * 0.03), ease: 'none', onUpdate: () => { typed.value = full.slice(0, Math.round(o.n)) } })
+  type(s.value.cmd, 0, !pa)
   const pk = wire.value!.querySelectorAll('.pk')
-  if (s.value.dir) gsap.fromTo(pk, { left: s.value.dir > 0 ? '0%' : '100%', opacity: 1 }, { left: s.value.dir > 0 ? '100%' : '0%', duration: 1.1, stagger: 0.18, ease: 'power2.inOut', delay: 0.3, onComplete() { gsap.to(pk, { opacity: 0, duration: 0.2 }) } })
+  // packets fade in at one end, travel, and fade out at the other
+  const [from, to] = s.value.dir > 0 ? ['0%', '100%'] : ['100%', '0%']
+  if (s.value.dir) pk.forEach((el, i) => gsap.timeline({ delay: 0.3 + i * 0.18 })
+    .fromTo(el, { left: from, opacity: 0 }, { left: to, duration: 1.2, ease: 'power2.inOut' })
+    .to(el, { opacity: 1, duration: 0.25 }, 0)
+    .to(el, { opacity: 0, duration: 0.25 }, 0.95))
   else gsap.to(pk, { opacity: 0, duration: 0.3 })
 })
 </script>
@@ -34,7 +36,7 @@ watch(() => [props.active, props.step] as const, ([a]) => {
         <div class="bh"><Laptop /><b>جهازك (local)</b></div>
         <div class="row"><TransitionGroup name="c"><span v-for="c in s.local" :key="c.h" class="c mono" :class="{ ghost: c.ghost }">{{ c.h }}</span></TransitionGroup></div>
         <Transition name="fx" mode="out-in"><span :key="String(s.local.some(c => c.ghost))" class="br mono">main{{ s.local.some(c => c.ghost) ? '   origin/main → c3' : '' }}</span></Transition>
-        <Transition name="c"><div v-if="s.mate" class="mate"><UserPlus /><span>جهاز زميل جديد</span><span class="row"><span v-for="c in s.local" :key="c.h" class="c mono sm">{{ c.h }}</span></span></div></Transition>
+        <div class="mate" :class="{ on: s.mate }"><UserPlus /><span>جهاز زميل جديد</span><span class="row"><span v-for="c in plan[5]!.local" :key="c.h" class="c mono sm">{{ c.h }}</span></span></div>
       </div>
       <div ref="wire" class="wire">
         <span class="lbl mono">origin</span>
@@ -54,7 +56,7 @@ watch(() => [props.active, props.step] as const, ([a]) => {
 </template>
 
 <style scoped>
-.stage { flex: 1; display: grid; grid-template-columns: 1fr 420px 1fr; align-items: center; gap: 0; }
+.stage { flex: 1; display: grid; grid-template-columns: 1fr 420px 1fr; align-items: stretch; align-content: center; gap: 0; }
 .box { position: relative; min-height: 360px; border-radius: 28px; border: 1px solid var(--line); background: rgba(255,255,255,.04); padding: 30px; display: flex; flex-direction: column; gap: 26px; }
 .box.gh { border-color: rgba(111,214,200,.4); background: rgba(28,157,142,.08); }
 .bh { display: flex; align-items: center; gap: 14px; font-size: 28px; direction: rtl; justify-content: flex-end; }
@@ -62,13 +64,17 @@ watch(() => [props.active, props.step] as const, ([a]) => {
 .row { display: flex; gap: 14px; align-items: center; min-height: 80px; }
 .c { width: 76px; height: 76px; border-radius: 50%; display: grid; place-items: center; background: var(--teal); font-size: 22px; font-weight: 700; color: var(--navy-dd); position: relative; }
 .c + .c::before { content: ''; position: absolute; right: 100%; width: 14px; height: 4px; background: var(--teal); }
-.c { transition: background .5s var(--ease), border-color .5s, color .5s; }
-.c.ghost { background: transparent; border: 3px dashed var(--teal-l); color: var(--teal-l); }
+/* every commit keeps a (transparent) dashed border, so fetched → merged only fades colours */
+.c { border: 3px dashed transparent; transition: background .6s var(--ease), border-color .6s var(--ease), color .6s var(--ease); }
+.c.ghost { background: transparent; border-color: var(--teal-l); color: var(--teal-l); }
 .c.sm { width: 50px; height: 50px; font-size: 16px; }
 .br { font-size: 20px; color: var(--ink-3); white-space: pre; }
-.mate { position: absolute; left: 0; right: 0; top: calc(100% + 24px); display: flex; align-items: center; gap: 16px; padding: 18px 22px; border-radius: 20px; border: 1px dashed rgba(255,255,255,.3); font-size: 22px; }
+/* space is always reserved, so the clone step fades in without moving anything */
+.mate { display: flex; align-items: center; gap: 16px; padding: 14px 22px; border-radius: 20px; border: 1px dashed rgba(255,255,255,.3); font-size: 22px; direction: rtl; opacity: 0; transform: translateY(14px); transition: opacity .3s, transform .3s; }
+.mate.on { opacity: 1; transform: none; transition: opacity .6s var(--ease) .5s, transform .6s var(--ease) .5s; }
+.mate .row { min-height: 0; direction: ltr; }
 .mate svg { width: 32px; height: 32px; color: var(--teal-l); }
-.wire { position: relative; height: 4px; margin: 0 20px; background: linear-gradient(90deg, var(--teal), var(--teal-l)); border-radius: 2px; }
+.wire { align-self: center; position: relative; height: 4px; margin: 0 20px; background: linear-gradient(90deg, var(--teal), var(--teal-l)); border-radius: 2px; }
 .lbl { position: absolute; left: 50%; top: -48px; translate: -50% 0; font-size: 22px; color: var(--teal-l); }
 .pk { position: absolute; top: -8px; width: 20px; height: 20px; margin-left: -10px; border-radius: 50%; background: #fff; box-shadow: 0 0 20px #fff; opacity: 0; }
 .c-enter-active { transition: all .7s var(--ease) .6s; } .c-leave-active { transition: all .3s; }

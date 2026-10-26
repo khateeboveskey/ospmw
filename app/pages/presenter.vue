@@ -9,8 +9,8 @@ const connected = ref(false)
 const cur = computed(() => slides[i.value]!)
 const nxt = computed(() => slides[i.value + 1])
 const steps = computed(() => cur.value.steps ?? 1)
-// wrap time ranges so they keep LTR order inside Arabic notes (notes are our own static strings)
-const ltr = (n: string) => n.replace(/\d{1,2}:\d{2}\s*–\s*\d{1,2}:\d{2}/g, (m) => `<span class="mono">${m}</span>`)
+// isolate time ranges so they read right-to-left like the deck (notes are our own static strings)
+const rng = (n: string) => n.replace(/\d{1,2}:\d{2}\s*–\s*\d{1,2}:\d{2}( م)?/g, (m) => `<span class="rng">${m}</span>`)
 
 const post = useDeckChannel((m) => {
   if (m.t === 'state') { i.value = m.i; s.value = m.s; connected.value = true }
@@ -57,7 +57,7 @@ onBeforeUnmount(() => { clearInterval(tick); removeEventListener('keydown', onKe
         <div :key="i" class="cur">
           <h1>{{ cur.title }}</h1>
           <div v-if="steps > 1" class="steps">الخطوة <span class="mono">{{ s + 1 }} / {{ steps }}</span></div>
-          <ul class="notes"><li v-for="n in cur.notes" :key="n" v-html="ltr(n)" /></ul>
+          <ul class="notes"><li v-for="n in cur.notes" :key="n" v-html="rng(n)" /></ul>
         </div>
       </Transition>
       <p v-if="!connected" class="warn">افتح العرض الرئيسي في تبويب آخر من نفس المتصفح (أو اضغط P من العرض).</p>

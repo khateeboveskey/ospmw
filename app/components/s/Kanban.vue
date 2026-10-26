@@ -22,7 +22,8 @@ const at = computed(() => plan[Math.min(props.step, plan.length - 1)]!)
 const board = ref<HTMLElement>()
 let state: Flip.FlipState | null = null
 watch(() => props.step, () => { if (board.value) state = Flip.getState(board.value.querySelectorAll('.kc')) }, { flush: 'pre' })
-watch(() => props.step, () => { if (state && props.active) Flip.from(state, { duration: 0.9, ease: 'expo.inOut', absolute: true, scale: true }) }, { flush: 'post' })
+// cards are re-created in their new column, so Flip must target the new elements (matched by data-flip-id)
+watch(() => props.step, () => { if (state && props.active) Flip.from(state, { targets: board.value!.querySelectorAll('.kc'), duration: 0.9, ease: 'expo.inOut', absolute: true, scale: true }) }, { flush: 'post' })
 </script>
 
 <template>
@@ -50,5 +51,10 @@ watch(() => props.step, () => { if (state && props.active) Flip.from(state, { du
 .cnt { margin-inline-start: auto; font-size: 20px; color: var(--ink-3); }
 .list { display: flex; flex-direction: column; gap: 12px; }
 .kc { display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-radius: 16px; background: var(--navy); border: 1px solid rgba(255,255,255,.16); font-size: 24px; box-shadow: 0 16px 30px -18px rgba(0,0,0,.6); }
-.kc.done { border-color: var(--teal); background: linear-gradient(135deg, rgba(28,157,142,.35), var(--navy)); }
+/* the done look is an overlay that fades in after the card lands (cards are re-created per column) */
+.kc { position: relative; }
+.kc::before { content: ''; position: absolute; inset: -1px; border-radius: inherit; border: 1px solid var(--teal); background: linear-gradient(135deg, rgba(28,157,142,.35), transparent); opacity: 0; pointer-events: none; }
+.kc > * { position: relative; }
+.kc.done::before { opacity: 1; animation: done-in .6s var(--ease) .7s backwards; }
+@keyframes done-in { from { opacity: 0; } }
 </style>

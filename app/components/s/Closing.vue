@@ -10,7 +10,7 @@ watch(() => props.active, (a) => {
 
 <template>
   <section class="slide end">
-    <div ref="art" class="dots" aria-hidden="true"><i v-for="n in 48" :key="n" /></div>
+    <div ref="art" class="dots" aria-hidden="true" data-own><i v-for="n in 48" :key="n" /></div>
     <div class="kicker" data-r>ختام الورشة</div>
     <h2 class="title xl" data-r>شكرًا <em>لكم</em></h2>
     <p class="lead" data-r>أسئلة؟ نقاش؟ — الكود الجيد يُكتب مرة، ويُراجَع دائمًا.</p>
@@ -21,7 +21,7 @@ watch(() => props.active, (a) => {
 <style scoped>
 .end { align-items: center; justify-content: center; text-align: center; gap: 28px; }
 .cmd { font-size: 28px; color: var(--teal-l); padding: 16px 30px; border: 1px solid var(--line); background: rgba(4,33,47,.6); border-radius: 16px; margin-top: 20px; }
-.dots { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(12, 1fr); place-items: center; padding: 120px; opacity: .22; pointer-events: none; }
+.dots { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(12, 1fr); place-items: center; padding: 120px; opacity: .22; pointer-events: none; mask-image: radial-gradient(ellipse 60% 55% at center, transparent 35%, #000 80%); }
 .dots i { width: 14px; height: 14px; border-radius: 50%; background: var(--teal); }
 .dots i:nth-child(5n) { background: #fff; width: 22px; height: 22px; }
 </style>

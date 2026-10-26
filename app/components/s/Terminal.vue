@@ -50,7 +50,7 @@ const prompt = computed(() => props.path ?? '~/my-app')
       <ol class="side">
         <li v-for="(it, i) in items" :key="i" :class="{ on: i === step, done: i < step }" data-r>
           <code>{{ it.label }}</code>
-          <Transition name="fx"><p v-if="i === step">{{ it.note }}</p></Transition>
+          <div class="nt"><p>{{ it.note }}</p></div>
         </li>
       </ol>
     </div>
@@ -64,9 +64,9 @@ const prompt = computed(() => props.path ?? '~/my-app')
 .bar i { width: 14px; height: 14px; border-radius: 50%; background: rgba(255,255,255,.18); }
 .bar i:first-child { background: var(--coral); } .bar i:nth-child(2) { background: var(--amber); } .bar i:nth-child(3) { background: var(--teal); }
 .bar span { margin-left: 14px; color: var(--ink-3); font-size: 18px; }
-.body { padding: 26px 30px; font-size: 25px; line-height: 1.6; overflow: hidden; flex: 1; }
+.body { padding: 26px 30px; font-size: 25px; line-height: 1.6; overflow: hidden; flex: 1; mask-image: linear-gradient(to bottom, transparent 0, #000 22px); }
 .blk + .blk { margin-top: 14px; }
-.blk { transition: opacity .4s var(--ease); }
+.blk { transition: opacity .4s var(--ease), transform .4s var(--ease), filter .4s var(--ease); }
 .blk:not(.last) { opacity: 0.45; }
 .pp { color: var(--sky); } .ps { color: var(--teal-l); }
 .o { color: var(--ink-2); white-space: pre; font-size: 22px; }
@@ -79,5 +79,9 @@ const prompt = computed(() => props.path ?? '~/my-app')
 .side li.done code { color: var(--ink-2); }
 .side li.on { background: var(--glass); border-color: rgba(111,214,200,.35); }
 .side li.on code { color: var(--teal-l); }
-.side p { font-size: 25px; color: var(--ink-2); margin-top: 8px; line-height: 1.55; }
+/* the active note opens smoothly instead of popping in and shifting the list */
+.nt { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .5s var(--ease); }
+.nt > p { min-height: 0; overflow: hidden; opacity: 0; padding-top: 8px; font-size: 25px; color: var(--ink-2); line-height: 1.55; transition: opacity .25s; }
+.side li.on .nt { grid-template-rows: 1fr; }
+.side li.on .nt > p { opacity: 1; transition: opacity .4s .15s; }
 </style>

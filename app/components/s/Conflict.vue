@@ -40,7 +40,7 @@ const steps = [
           </div>
           <template v-else-if="step < 3">
             <p><span class="ln">1</span>function greet(name) {</p>
-            <p class="mk head"><span class="ln">2</span>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</p>
+            <p class="mk hd"><span class="ln">2</span>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</p>
             <p class="ours"><span class="ln">3</span>  return `مرحبًا ${name}`</p>
             <p class="mk"><span class="ln">4</span>=======</p>
             <p class="theirs"><span class="ln">5</span>  return `أهلًا وسهلًا ${name}`</p>
@@ -77,9 +77,10 @@ const steps = [
 .warn { color: var(--coral); font-weight: 700; } .ok { color: var(--teal-l); font-weight: 700; }
 .code { padding: 30px; font-size: 27px; line-height: 1.75; flex: 1; }
 .code p { white-space: pre; }
+.code .msg p { white-space: pre-wrap; }
 .ln { display: inline-block; width: 40px; color: var(--ink-3); font-size: 20px; }
 .mk { color: var(--ink-3); }
-.mk.head { color: var(--teal-l); } .mk.inc { color: var(--sky); }
+.mk.hd { color: var(--teal-l); } .mk.inc { color: var(--sky); }
 .ours { background: rgba(28,157,142,.2); } .theirs { background: rgba(143,195,221,.16); }
 .fixed { background: rgba(28,157,142,.25); border-left: 4px solid var(--teal-l); }
 .msg .r { color: var(--coral); } .d { color: var(--ink-3); } .g { color: var(--teal-l); }

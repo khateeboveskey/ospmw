@@ -22,7 +22,7 @@ const stages = [
     </div>
     <div class="pr card" data-step="2">
       <div class="top" dir="ltr">
-        <Transition name="fx" mode="out-in"><span :key="String(step >= 5)" class="state mono" :class="{ merged: step >= 5 }"><component :is="step >= 5 ? GitMerge : GitPullRequest" /> {{ step >= 5 ? 'Merged' : 'Open' }}</span></Transition>
+        <span class="swap"><Transition name="fx"><span :key="String(step >= 5)" class="state mono" :class="{ merged: step >= 5 }"><component :is="step >= 5 ? GitMerge : GitPullRequest" /> {{ step >= 5 ? 'Merged' : 'Open' }}</span></Transition></span>
         <b class="mono">feat: add login page</b><span class="num mono">#42</span>
       </div>
       <p class="desc"><span class="mono">feature/login → main</span> · يضيف صفحة تسجيل الدخول مع التحقق من المدخلات. <span class="mono link">Closes #17</span></p>
@@ -46,8 +46,11 @@ const stages = [
 .st.cur .ic { background: var(--teal); box-shadow: 0 0 50px rgba(28,157,142,.7); scale: 1.12; }
 .pr { display: flex; flex-direction: column; gap: 20px; max-width: 1300px; align-self: center; width: 100%; }
 .top { display: flex; align-items: center; gap: 18px; font-size: 32px; }
-.state { display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; border-radius: 999px; background: #1f883d; font-size: 21px; transition: background .5s; }
+/* both chips share one grid cell and crossfade; the slot keeps the wider width, so the title never jumps */
+.swap { display: inline-grid; justify-items: start; } .swap > * { grid-area: 1 / 1; }
+.state { display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; border-radius: 999px; background: #1f883d; font-size: 21px; }
 .state.merged { background: #8250df; }
+.state { min-width: 150px; justify-content: center; } /* Open and Merged occupy the same width */
 .state svg { width: 22px; height: 22px; }
 .num { color: var(--ink-3); }
 .desc { font-size: 24px; color: var(--ink-2); }

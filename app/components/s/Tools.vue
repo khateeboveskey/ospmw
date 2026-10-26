@@ -26,7 +26,7 @@ const issues = [
       <div class="side">
         <div class="card ms" data-step="2">
           <div class="mh"><Milestone /><b class="mono">v1.0 — Launch</b><span class="mono">due Nov 30</span></div>
-          <div class="bar"><div class="fill" /></div>
+          <div class="bar"><div class="fill" :class="{ on: step >= 2 }" /></div>
           <small>65% مكتمل · 13 مغلقة · 7 مفتوحة</small>
         </div>
         <div class="card pj" data-step="3">
@@ -57,7 +57,8 @@ const issues = [
 .mh svg { width: 34px; height: 34px; color: var(--teal-l); }
 .mh span { margin-inline-start: auto; font-size: 18px; color: var(--ink-3); }
 .bar { height: 14px; border-radius: 7px; background: rgba(255,255,255,.1); overflow: hidden; }
-.fill { width: 65%; height: 100%; background: linear-gradient(90deg, var(--teal), var(--teal-l)); border-radius: 7px; }
+.fill { width: 65%; height: 100%; background: linear-gradient(90deg, var(--teal), var(--teal-l)); border-radius: 7px; transform: scaleX(0); transform-origin: right; transition: transform 1.2s var(--ease) .5s; }
+.fill.on { transform: none; }
 .ms small { font-size: 21px; color: var(--ink-2); }
 .pj p { font-size: 25px; line-height: 1.6; color: var(--ink-2); }
 </style>

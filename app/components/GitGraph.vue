@@ -5,13 +5,14 @@ import gsap from 'gsap'
    Each step is a delta on top of the previous one, so a slide only lists what changes. */
 import type { GNode, GStep } from '~/data/types'
 
-const props = defineProps<{ title?: string; lanes: { name: string; color: string }[]; nodes: GNode[]; steps: GStep[]; dx?: number; dy?: number; active: boolean; step: number }>()
+const props = defineProps<{ title?: string; lanes: { name: string; color: string }[]; nodes: GNode[]; steps: GStep[]; dx?: number; dy?: number; span?: [number, number]; active: boolean; step: number }>()
 
 const DX = props.dx ?? 210
 const DY = props.dy ?? 150
-const X0 = 210
-const Y0 = 150
-const R = 26
+const R = 28
+const PAD = 26
+// ref labels stack away from their node: above on the top lane, below elsewhere
+const refOff = (k: number) => 64 + k * 48
 const byId = Object.fromEntries(props.nodes.map((n) => [n.id, n]))
 
 const states = computed(() => {
@@ -30,10 +31,25 @@ const states = computed(() => {
 type State = (typeof states.value)[number]
 const st = computed(() => states.value[Math.min(props.step, states.value.length - 1)]!)
 
-const maxX = Math.max(...props.nodes.map((n) => n.x), ...props.steps.flatMap((s) => Object.values(s.pos ?? {}).map((p) => p[0])))
-const maxL = props.lanes.length - 1
-const W = X0 + maxX * DX + 190
-const H = Y0 + maxL * DY + 150
+const maxX = Math.max(props.span?.[0] ?? 0, ...props.nodes.map((n) => n.x), ...props.steps.flatMap((s) => Object.values(s.pos ?? {}).map((p) => p[0])))
+const maxL = Math.max(props.span?.[1] ?? 0, props.lanes.length - 1)
+/* fit the viewBox to what is actually drawn across all steps, so the graph scales as large as the slide allows */
+const laneOf = (id: string, s: State) => s.pos[id]?.[1] ?? byId[id]!.l
+const groupsOf = (s: State) => {
+  const g: Record<string, string[]> = {}
+  for (const [r, n] of Object.entries(s.refs)) (g[n] ??= []).push(r)
+  return Object.entries(g).map(([n, rs]) => [n, rs.flatMap((r) => (r === s.head ? [r, 'HEAD'] : [r]))] as const)
+}
+let lo = -R; let hi = maxL * DY + R
+for (const s of states.value) for (const [n, list] of groupsOf(s)) {
+  const y = laneOf(n, s) * DY
+  if (laneOf(n, s) === 0) lo = Math.min(lo, y - refOff(list.length - 1) - 20)
+  else hi = Math.max(hi, y + refOff(list.length - 1) + 20)
+}
+const X0 = 24 + Math.max(...props.lanes.map((l) => l.name.length)) * 14.5 + 90
+const Y0 = PAD - lo
+const W = X0 + maxX * DX + 130
+const H = Y0 + hi + PAD
 
 const laneColor = (l: number) => props.lanes[Math.round(l)]?.color ?? '#fff'
 const nodeColor = (n: GNode) => n.c ?? laneColor(n.l)
@@ -49,26 +65,22 @@ const edgeD = (e: { from: string; to: string }, s: State) => {
 }
 const refNames = [...new Set(props.steps.flatMap((s) => Object.keys(s.refs ?? {})))]
 const refColor = (r: string) => props.lanes.find((l) => l.name === r)?.color ?? '#ffffff'
-const refW = (r: string) => 30 + r.length * 11.5
+const refW = (r: string) => 34 + r.length * 13
 
 /* ref label placement: stacked above the node on the top lane, below elsewhere */
 function refPos(s: State) {
   const out: Record<string, [number, number]> = {}
-  const groups: Record<string, string[]> = {}
-  for (const [r, n] of Object.entries(s.refs)) (groups[n] ??= []).push(r)
-  for (const [n, rs] of Object.entries(groups)) {
-    const list = rs.flatMap((r) => (r === s.head ? [r, 'HEAD'] : [r]))
+  for (const [n, list] of groupsOf(s)) {
     const [x, y] = xy(n, s)
-    const up = (s.pos[n]?.[1] ?? byId[n]!.l) === 0
-    list.forEach((r, k) => (out[r] = [x, up ? y - 58 - k * 44 : y + 58 + k * 44]))
+    const up = laneOf(n, s) === 0
+    list.forEach((r, k) => (out[r] = [x, up ? y - refOff(k) : y + refOff(k)]))
   }
   return out
 }
 
 const root = ref<SVGSVGElement>()
-const typed = ref('')
+const { typed, type } = useTyper()
 let prevOn = new Set<string>()
-let typing: gsap.core.Tween | null = null
 
 function apply(s: State, base = 0) {
   const svg = root.value; if (!svg) return
@@ -82,7 +94,8 @@ function apply(s: State, base = 0) {
     const dim = s.dim.has(e.to)
     if (on && (fresh.has(e.to) || fresh.has(e.from))) {
       gsap.set(el, { attr: { d }, strokeDashoffset: 1, opacity: dim ? 0.25 : 1 })
-      gsap.to(el, { strokeDashoffset: 0, duration: 0.6, ease: 'power2.inOut', delay: base + k++ * 0.12 })
+      // pathLength units (1 → 0): px rounding would make the draw jump
+      gsap.to(el, { strokeDashoffset: 0, autoRound: false, duration: 0.6, ease: 'power2.inOut', delay: base + k++ * 0.12 })
     } else gsap.to(el, { attr: { d }, opacity: on ? (dim ? 0.25 : 1) : 0, duration: 0.8, ease: 'expo.inOut', delay: base })
   }
   k = 0
@@ -112,11 +125,7 @@ function apply(s: State, base = 0) {
   }
   prevOn = new Set(s.on)
 
-  typing?.kill()
-  const full = s.cmd
-  const o = { n: 0 }
-  typed.value = ''
-  typing = gsap.to(o, { n: full.length, duration: Math.min(1.2, full.length * 0.035), ease: 'none', delay: base + 0.1, onUpdate: () => { typed.value = full.slice(0, Math.round(o.n)) } })
+  type(s.cmd, base + 0.1, base > 0)
 }
 
 function reset() {
@@ -147,16 +156,18 @@ onMounted(reset)
         <text v-if="n.t" class="msg"  y="58">{{ n.t }}</text>
       </g>
       <g v-for="r in refNames" :key="r" :data-ref="r">
-        <rect :x="-refW(r) / 2" y="-18" :width="refW(r)" height="36" rx="18" fill="#04212f" :stroke="refColor(r)" stroke-width="2" />
+        <rect :x="-refW(r) / 2" y="-20" :width="refW(r)" height="40" rx="20" fill="#04212f" :stroke="refColor(r)" stroke-width="2" />
         <text class="ref" y="6" :fill="refColor(r)">{{ r }}</text>
       </g>
       <g data-ref="HEAD">
-        <rect x="-40" y="-18" width="80" height="36" rx="10" fill="#1c9d8e" />
+        <rect x="-46" y="-20" width="92" height="40" rx="11" fill="#1c9d8e" />
         <text class="ref head" y="6">HEAD</text>
       </g>
     </svg>
-    <div class="term mono"><span class="ps">$</span> {{ typed }}<span class="caret" /></div>
-    <Transition name="say" mode="out-in"><p :key="st.say" class="say">{{ st.say }}</p></Transition>
+    <div class="foot">
+      <div class="term mono"><span class="ps">$</span> {{ typed }}<span class="caret" /></div>
+      <Transition name="say" mode="out-in"><p :key="st.say" class="say">{{ st.say }}</p></Transition>
+    </div>
   </div>
 </template>
 
@@ -165,18 +176,21 @@ onMounted(reset)
 .gt { font-size: 30px; font-weight: 700; color: var(--teal-l); }
 .svg { width: 100%; flex: 1; min-height: 0; overflow: visible; }
 .lane line { stroke-dasharray: 4 10; stroke-width: 1.5; opacity: 0.35; }
-.lane text { font-family: var(--mono); font-size: 20px; font-weight: 500; }
+.lane text { font-family: var(--mono); font-size: 24px; font-weight: 500; }
 .lane { transition: opacity 0.6s var(--ease); }
 .edge { fill: none; stroke-width: 6; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 0; }
-.hash { font-family: var(--mono); font-size: 15px; font-weight: 700; fill: #04212f; text-anchor: middle; }
+.hash { font-family: var(--mono); font-size: 17px; font-weight: 700; fill: #04212f; text-anchor: middle; }
 .msg { font-size: 17px; fill: var(--ink-2); text-anchor: middle; font-family: var(--mono); }
-.ref { font-family: var(--mono); font-size: 18px; font-weight: 700; text-anchor: middle; }
+.ref { font-family: var(--mono); font-size: 21px; font-weight: 700; text-anchor: middle; }
 .ref.head { fill: #fff; }
-.term { align-self: flex-start; direction: ltr; font-size: 26px; padding: 14px 24px; border-radius: 14px; background: rgba(4, 33, 47, 0.7); border: 1px solid var(--line); min-width: 560px; min-height: 64px; }
+.foot { display: flex; align-items: center; gap: 36px; }
+.term { flex: none; direction: ltr; font-size: 26px; padding: 14px 24px; border-radius: 14px; background: rgba(4, 33, 47, 0.7); border: 1px solid var(--line); min-width: 600px; min-height: 64px; white-space: nowrap; }
 .ps { color: var(--teal-l); margin-right: 8px; }
 .caret { display: inline-block; width: 12px; height: 26px; background: var(--teal-l); vertical-align: -4px; margin-left: 4px; animation: blink 1s steps(1) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
-.say { font-size: 30px; color: var(--ink-2); min-height: 48px; line-height: 1.5; }
+.say { flex: 1; font-size: 29px; color: var(--ink-2); line-height: 1.5; }
+/* two lines are always reserved so a longer caption never resizes (and jolts) the graph */
+.foot { min-height: 87px; }
 .say-enter-active, .say-leave-active { transition: opacity 0.35s var(--ease), transform 0.35s var(--ease); }
 .say-enter-from { opacity: 0; transform: translateY(12px); }
 .say-leave-to { opacity: 0; transform: translateY(-8px); }

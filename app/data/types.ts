@@ -6,4 +6,5 @@ export type GStep = {
   head?: string
   cmd?: string; say?: string
 }
-export type GraphDef = { title?: string; lanes: { name: string; color: string }[]; nodes: GNode[]; steps: GStep[]; dx?: number; dy?: number }
+// span: minimum [columns, lanes] to lay out, so graphs shown side by side share one scale
+export type GraphDef = { title?: string; lanes: { name: string; color: string }[]; nodes: GNode[]; steps: GStep[]; dx?: number; dy?: number; span?: [number, number] }

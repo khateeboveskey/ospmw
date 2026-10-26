@@ -15,12 +15,18 @@ const plan: { wd: F[]; stg: F[]; repo: string[]; cmd: string; say: string }[] = 
   { wd: [{ id: 'style.css', st: 'M' }], stg: [], repo: ['a1f3c', 'e7b21'], cmd: 'git diff', say: 'تعديل جديد يبدأ الدورة من جديد… و git diff يُظهر ما تغيّر بالضبط.' },
 ]
 const s = computed(() => plan[Math.min(props.step, plan.length - 1)]!)
-const typed = ref('')
-let typing: gsap.core.Tween | null = null
+const { typed, type } = useTyper()
 const root = ref<HTMLElement>()
 let state: Flip.FlipState | null = null
 
-watch(() => props.step, () => { if (root.value) state = Flip.getState(root.value.querySelectorAll('[data-flip-id]')) }, { flush: 'pre' })
+// boxes before the DOM patch: leaving items are pinned where they were, not where the reflow puts them
+const boxes = new WeakMap<Element, { top: number; left: number; width: number }>()
+watch(() => props.step, () => {
+  if (!root.value) return
+  const els = root.value.querySelectorAll<HTMLElement>('[data-flip-id]')
+  els.forEach((el) => boxes.set(el, { top: el.offsetTop, left: el.offsetLeft, width: el.offsetWidth }))
+  state = Flip.getState(els)
+}, { flush: 'pre' })
 watch(() => [props.active, props.step] as const, ([a], [pa]) => {
   if (!a) return
   if (state && pa) {
@@ -28,14 +34,10 @@ watch(() => [props.active, props.step] as const, ([a], [pa]) => {
       targets: root.value!.querySelectorAll('[data-flip-id]:not([data-leaving])'),
       duration: 0.9, ease: 'expo.inOut', absolute: true, scale: true,
       onEnter: (els) => gsap.fromTo(els, { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.7, delay: 0.5, ease: 'back.out(2)' }),
-      onLeave: (els) => gsap.to(els, { opacity: 0, scale: 0.3, x: 200, duration: 0.6, ease: 'power3.in' }),
     })
   }
   state = null
-  const full = s.value.cmd
-  const o = { n: 0 }
-  typing?.kill()
-  typing = gsap.to(o, { n: full.length, duration: Math.min(1.1, full.length * 0.035), ease: 'none', onUpdate: () => { typed.value = full.slice(0, Math.round(o.n)) } })
+  type(s.value.cmd, 0, !pa)
 }, { flush: 'post' })
 
 /* items removed from a zone: if they reappear elsewhere Flip moves the new copy, otherwise they fly out */
@@ -44,7 +46,8 @@ function onLeave(el: Element, done: () => void) {
   h.dataset.leaving = ''
   const id = h.dataset.flipId
   const moved = root.value?.querySelector(`[data-flip-id="${id}"]:not([data-leaving])`)
-  gsap.set(h, { position: 'absolute', top: h.offsetTop, left: h.offsetLeft, width: h.offsetWidth, margin: 0 })
+  const b = boxes.get(h) ?? { top: h.offsetTop, left: h.offsetLeft, width: h.offsetWidth }
+  gsap.set(h, { position: 'absolute', ...b, margin: 0 })
   if (moved) return gsap.to(h, { opacity: 0, duration: 0.15, onComplete: done })
   gsap.to(h, { opacity: 0, x: 220, scale: 0.4, duration: 0.7, ease: 'power3.in', onComplete: done })
 }

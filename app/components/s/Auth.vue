@@ -3,16 +3,23 @@ import gsap from 'gsap'
 import { KeyRound, Lock, LockOpen, Ticket, ShieldAlert } from 'lucide-vue-next'
 const props = defineProps<{ active: boolean; step: number; time?: string }>()
 const key = ref<HTMLElement>()
+const dev = ref<HTMLElement>()
+const lk = ref<HTMLElement>()
 const open = ref(false)
-watch(() => [props.active, props.step] as const, ([a, s]) => {
-  if (!a) return
-  if (s === 0) {
-    open.value = false
-    gsap.timeline()
-      .to(key.value!, { x: 0, rotate: 0, duration: 0.4, ease: 'power2.out' })
-      .to(key.value!, { x: -230, duration: 1.2, ease: 'expo.inOut' }, 0.9)
-      .to(key.value!, { rotate: 90, duration: 0.4, onComplete: () => { open.value = true } })
-  }
+let tl: gsap.core.Timeline | null = null
+// the private key travels to the public-key lock and opens it; replays on entry and when stepping back to 0
+watch(() => [props.active, props.step] as const, ([a, s], [pa]) => {
+  if (!a || (pa && s > 0)) return
+  tl?.kill()
+  open.value = false
+  const mid = (el: HTMLElement) => el.offsetLeft + el.offsetWidth / 2
+  const dx = mid(lk.value!) - mid(dev.value!) - 105 // stop at the keyhole, beside the lock
+  if (!pa) gsap.set(key.value!, { x: 0, rotate: 0 }) // slide is still hidden here
+  tl = gsap.timeline({ delay: pa ? 0 : 0.9 })
+  if (pa) tl.to(key.value!, { x: 0, rotate: 0, duration: 0.6, ease: 'power2.inOut' })
+  tl.to(key.value!, { x: dx, duration: 1.2, ease: 'expo.inOut' })
+    .to(key.value!, { rotate: 90, duration: 0.45, ease: 'back.out(2)' })
+    .call(() => { open.value = true })
 })
 </script>
 
@@ -24,8 +31,8 @@ watch(() => [props.active, props.step] as const, ([a, s]) => {
         <h3 class="mono">SSH</h3>
         <p>زوج مفاتيح: <b>المفتاح العام</b> يُرفع إلى GitHub كقفل، و<b>المفتاح الخاص</b> يبقى على جهازك فقط.</p>
         <div class="anim" dir="ltr">
-          <div class="dev"><span ref="key" class="key"><KeyRound /></span><small>private key · جهازك</small></div>
-          <div class="lk" :class="{ open }"><Transition name="fx" mode="out-in"><component :is="open ? LockOpen : Lock" :key="String(open)" /></Transition><small>public key · GitHub</small></div>
+          <div ref="dev" class="dev"><span ref="key" class="key"><KeyRound /></span><small>private key · جهازك</small></div>
+          <div ref="lk" class="lk" :class="{ open }"><span class="swap"><Transition name="fx"><component :is="open ? LockOpen : Lock" :key="String(open)" /></Transition></span><small>public key · GitHub</small></div>
         </div>
         <code>ssh-keygen -t ed25519 -C "you@example.com"</code>
       </div>
@@ -48,10 +55,11 @@ watch(() => [props.active, props.step] as const, ([a, s]) => {
 .side b { color: #fff; }
 .anim { display: flex; justify-content: space-between; align-items: center; padding: 10px 30px; flex: 1; }
 .dev, .lk { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.swap { display: grid; } .swap > * { grid-area: 1 / 1; } /* locked/open icons crossfade in place */
 .dev small, .lk small { font-size: 18px; color: var(--ink-3); font-family: var(--mono); }
 .key { display: inline-grid; color: var(--amber); }
 .key svg { width: 80px; height: 80px; stroke-width: 1.5; }
-.lk svg { width: 96px; height: 96px; stroke-width: 1.5; color: var(--ink-2); transition: color .4s; }
+.lk svg { width: 96px; height: 96px; stroke-width: 1.5; color: var(--ink-2); } /* no own transition: the fx swap animates it */
 .lk.open svg { color: var(--teal-l); filter: drop-shadow(0 0 20px var(--teal)); }
 code { font-size: 22px; color: var(--teal-l); background: rgba(4,33,47,.6); padding: 12px 18px; border-radius: 12px; align-self: flex-start; }
 .tok { display: flex; align-items: center; gap: 14px; font-size: 34px; padding: 22px 26px; border-radius: 18px; background: rgba(4,33,47,.6); border: 1px dashed rgba(244,194,107,.5); color: var(--amber); margin-top: auto; }

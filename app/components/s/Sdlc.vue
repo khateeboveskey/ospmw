@@ -16,8 +16,11 @@ const orb = ref<SVGCircleElement>()
 const ring = ref<SVGCircleElement>()
 watch(() => [props.active, props.step] as const, ([a, s], [pa]) => {
   if (!a) return
-  if (!pa) gsap.fromTo(ring.value!, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.6, ease: 'expo.inOut', delay: 0.4 })
-  gsap.to(orb.value!, { attr: { cx: pos[s]!.x, cy: pos[s]!.y }, duration: 0.9, ease: 'expo.inOut' })
+  const at = { cx: pos[s]!.x, cy: pos[s]!.y }
+  if (pa) return void gsap.to(orb.value!, { attr: at, duration: 0.9, ease: 'expo.inOut' })
+  // entering: draw the ring, then the orb grows in at the current phase
+  gsap.fromTo(ring.value!, { strokeDashoffset: 1 }, { strokeDashoffset: 0, autoRound: false, duration: 1.6, ease: 'expo.inOut', delay: 0.4 })
+  gsap.fromTo(orb.value!, { attr: { ...at, r: 0 } }, { attr: { r: 70 }, duration: 0.8, ease: 'back.out(1.8)', delay: 1.2 })
 })
 const cur = computed(() => phases[props.step]!)
 </script>
@@ -51,14 +54,14 @@ const cur = computed(() => phases[props.step]!)
 </template>
 
 <style scoped>
-.wrap { display: flex; justify-content: space-between; align-items: center; height: 100%; margin-top: -40px; }
+.wrap { display: flex; justify-content: space-between; align-items: center; height: 100%; }
 .txt { width: 760px; }
 .cur { display: flex; flex-direction: column; gap: 14px; }
 .row1 { display: flex; align-items: center; justify-content: space-between; }
 .en { color: var(--teal-l); font-size: 22px; }
 .cur h3 { font-family: var(--serif); font-size: 52px; }
 .cur p { font-size: 28px; color: var(--ink-2); line-height: 1.55; }
-.wheel { position: relative; width: 840px; height: 840px; flex: none; }
+.wheel { position: relative; width: 840px; height: 840px; flex: none; scale: .88; }
 .wheel > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .ring { fill: none; stroke: rgba(111,214,200,.35); stroke-width: 3; stroke-dasharray: 1; }
 .orb { fill: rgba(28,157,142,.25); stroke: var(--teal-l); stroke-width: 2; }

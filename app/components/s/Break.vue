@@ -11,7 +11,7 @@ watch(() => props.active, (a) => {
   clearInterval(timer)
   if (!a) return
   left.value = total
-  gsap.fromTo(ring.value!, { strokeDashoffset: 0 }, { strokeDashoffset: 1, duration: total, ease: 'none' })
+  gsap.fromTo(ring.value!, { strokeDashoffset: 0 }, { strokeDashoffset: 1, autoRound: false, duration: total, ease: 'none' })
   timer = setInterval(() => { left.value = Math.max(0, left.value - 1) }, 1000)
 })
 onBeforeUnmount(() => clearInterval(timer))
@@ -42,7 +42,7 @@ const mmss = computed(() => `${String(Math.floor(left.value / 60)).padStart(2, '
 .brk { flex-direction: row; align-items: center; justify-content: space-between; }
 .txt { display: flex; flex-direction: column; gap: 26px; }
 .clock { position: relative; width: 520px; height: 520px; }
-.clock svg { width: 100%; height: 100%; transform: rotate(-90deg) scaleY(-1); }
+.clock > svg { width: 100%; height: 100%; transform: rotate(-90deg) scaleY(-1); }
 .track { fill: none; stroke: rgba(255,255,255,.08); stroke-width: 14; }
 .ring { fill: none; stroke: var(--teal); stroke-width: 14; stroke-linecap: round; stroke-dasharray: 1; }
 .in { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 12px; }

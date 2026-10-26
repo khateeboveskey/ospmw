@@ -16,6 +16,8 @@ const blobs = ref<HTMLElement>()
 const total = slides.length
 const cur = computed(() => slides[Math.max(0, idx.value)]!)
 const stepsOf = (i: number) => slides[i]?.steps ?? 1
+// build step per slide: a leaving slide keeps its state until it is fully hidden
+const slotStep = reactive(slides.map(() => 0))
 
 let slots: HTMLElement[] = []
 let tl: gsap.core.Timeline | null = null
@@ -55,41 +57,50 @@ function syncOut() {
 
 function setStep(s: number) {
   step.value = s
+  slotStep[idx.value] = s
   applySteps(slots[idx.value]!, s)
   syncOut()
 }
 
-function go(to: number, s = 0, instant = false) {
+const shown = (el: HTMLElement) => Number(gsap.getProperty(el, 'opacity')) > 0.02 && getComputedStyle(el).visibility !== 'hidden'
+
+function go(to: number, s = 0) {
   to = Math.max(0, Math.min(total - 1, to))
   if (to === idx.value) return setStep(s)
-  const from = idx.value
-  const dir = to > from ? 1 : -1
-  tl?.progress(1).kill()
-  const a = slots[from]
+  const first = idx.value < 0
+  const dir = to > idx.value ? 1 : -1
+  // interrupt, don't fast-forward: whatever is on screen leaves from where it is
+  tl?.kill()
   const b = slots[to]!
+  const outs = slots.filter((el, i) => i !== to && shown(el))
+  const resumed = shown(b) // came back to a slide that was still leaving
   idx.value = to
   step.value = s
+  slotStep[to] = s
   syncOut()
   moveBlobs(to)
   gsap.to(bar.value!, { scaleX: (to + 1) / total, duration: 1, ease: 'expo.inOut' })
 
-  // hide future builds on the incoming slide before it is revealed
+  // future builds start hidden; the slide itself is still invisible here
   b.querySelectorAll<HTMLElement>('[data-step]').forEach((n) => {
-    if (Number(n.dataset.step) > s) gsap.set(n, { autoAlpha: 0, y: 28 })
+    if (Number(n.dataset.step) > s && !resumed) gsap.set(n, { autoAlpha: 0, y: 28 })
   })
-  if (instant) {
-    if (a) gsap.set(a, { autoAlpha: 0 })
-    gsap.set(b, { autoAlpha: 1, clipPath: 'none', y: 0, scale: 1 })
-    applySteps(b, s)
-    return
-  }
   const divider = slides[to]!.kind === 'divider'
   tl = gsap.timeline()
-  if (a) tl.to(a, { autoAlpha: 0, y: -70 * dir, scale: 0.97, filter: 'blur(8px)', duration: 0.55, ease: 'power3.in' })
+  if (outs.length) {
+    tl.to(outs, { autoAlpha: 0, y: -70 * dir, scale: 0.97, filter: 'blur(8px)', duration: 0.55, ease: 'power2.in' })
+    // outgoing slides keep their build state while visible, and reset once gone
+    tl.call(() => outs.forEach((el) => { const i = slots.indexOf(el); if (i !== idx.value) slotStep[i] = 0 }))
+  }
+  if (resumed) {
+    tl.to(b, { autoAlpha: 1, y: 0, scale: 1, filter: 'blur(0px)', clipPath: 'inset(0% 0% 0% 0%)', duration: 0.7, ease: 'expo.out' }, 0)
+    tl.call(() => applySteps(b, step.value), [], 0.1)
+    return
+  }
   tl.fromTo(b,
     { autoAlpha: 1, y: 0, scale: 1, filter: 'blur(0px)', clipPath: dir > 0 ? 'inset(100% 0% 0% 0%)' : 'inset(0% 0% 100% 0%)' },
     { clipPath: 'inset(0% 0% 0% 0%)', duration: divider ? 1.2 : 0.95, ease: 'expo.inOut' }, 0.12)
-  if (!a) intro()
+  if (first) intro()
   const rev = revealTargets(b)
   if (rev.length) tl.fromTo(rev, { y: 60, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.9, stagger: 0.07, ease: 'expo.out' }, 0.55)
   tl.call(() => applySteps(b, step.value), [], 0.75)
@@ -211,7 +222,7 @@ const pad = (n: number) => String(n).padStart(2, '0')
 
     <div ref="canvas" class="canvas" :style="{ '--s': scale }">
       <div v-for="(s, i) in slides" :key="i" class="slot" :aria-hidden="i !== idx">
-        <component :is="s.c" v-bind="s.props" :active="i === idx" :step="i === idx ? step : 0" />
+        <component :is="s.c" v-bind="s.props" :active="i === idx" :step="slotStep[i]!" />
       </div>
 
       <header class="chrome-top">
