@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 140" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#111827" />
+      <stop offset="100%" stop-color="#1f2937" />
+    </linearGradient>
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#818cf8" />
+    </linearGradient>
+    <style>
+      .title-bold { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 52px; font-weight: 800; fill: url(#accentGradient); }
+      .title-light { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 52px; font-weight: 300; fill: #f9fafb; }
+      .tagline { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 13px; font-weight: 600; fill: #9ca3af; letter-spacing: 4px; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="500" height="140" rx="20" fill="url(#bgGradient)" />
+
+  <!-- Abstract Tech/Engineering Icon -->
+  <g transform="translate(45, 35)">
+    <!-- Hexagon Base -->
+    <polygon points="35,0 70,17.5 70,52.5 35,70 0,52.5 0,17.5" fill="none" stroke="url(#accentGradient)" stroke-width="3" stroke-linejoin="round" />
+    <!-- Inner Circuit Lines -->
+    <path d="M35 15 L35 35 L55 45 M35 35 L15 45" fill="none" stroke="#e5e7eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+    <!-- Nodes -->
+    <circle cx="35" cy="15" r="4" fill="#38bdf8" />
+    <circle cx="55" cy="45" r="4" fill="#818cf8" />
+    <circle cx="15" cy="45" r="4" fill="#818cf8" />
+  </g>
+
+  <!-- Text Group -->
+  <g transform="translate(145, 82)">
+    <text class="title-bold">Eng.</text>
+    <text x="115" class="title-light">Ali</text>
+    
+    <!-- Tagline -->
+    <text y="30" class="tagline">INFORMATION TECHNOLOGY</text>
+  </g>
+</svg>
